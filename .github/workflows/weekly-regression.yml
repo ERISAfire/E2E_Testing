@@ -1,0 +1,60 @@
+name: Weekly Regression Tests
+
+on:
+  schedule:
+    # Run at 01:00 UTC every Monday
+    - cron: '0 1 * * 1'
+  workflow_dispatch: # Also allow manual triggering
+
+jobs:
+  regression:
+    name: Run Regression Tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 180
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+        with:
+          ref: 'main'
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install Playwright browsers
+        run: npx playwright install --with-deps
+
+      - name: Create .env file
+        run: |
+          cat > .env << EOF
+          BASE_URL=${{ secrets.BASE_URL }}
+          API_BASE_URL=${{ secrets.API_BASE_URL }}
+          USER_USERNAME=${{ secrets.USER_USERNAME }}
+          USER_PASSWORD=${{ secrets.USER_PASSWORD }}
+          DEFAULT_TIMEOUT=30000
+          API_TIMEOUT=10000
+          EOF
+
+      - name: Run regression tests
+        run: |
+          npm run allure:clean
+          npx playwright test --grep @regression
+        timeout-minutes: 120
+
+      - name: Generate Allure Report
+        if: always()
+        run: npm run allure:static
+
+      - name: Publish Test Results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: regression-results
+          path: allure-report/
+          retention-days: 30

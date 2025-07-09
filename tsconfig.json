@@ -1,0 +1,22 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "commonjs",
+    "lib": ["ES2022", "dom"],
+    "baseUrl": "./src",
+    "paths": {
+      "@core/*": ["core/*"],
+      "@api/*": ["api/*"],
+      "@ui/*": ["ui/*"],
+      "@config/*": ["config/*"],
+      "@factories/*": ["factories/*"]
+    },
+    "esModuleInterop": true,
+    "strict": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "resolveJsonModule": true
+  },
+  "include": ["src/**/*", "eslint.config.js", "allure-helper.ts"],
+  "exclude": ["node_modules"]
+}

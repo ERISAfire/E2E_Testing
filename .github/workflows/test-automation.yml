@@ -1,0 +1,64 @@
+name: Test Automation Framework CI/CD
+
+on:
+  workflow_dispatch:
+    inputs:
+      testTags:
+        description: 'Tags to run (e.g. @smoke, @regression, @api, @ui, @critical, @auth)'
+        required: true
+        default: '@smoke'
+        type: string
+      branch:
+        description: 'Branch to run tests from'
+        required: true
+        default: 'main'
+        type: string
+
+jobs:
+  test:
+    name: Run Tests
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+        with:
+          ref: ${{ github.event.inputs.branch }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '22'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install Playwright browsers
+        run: npx playwright install --with-deps
+
+      - name: Create .env file
+        run: |
+          cat > .env << EOF
+          BASE_URL=${{ secrets.BASE_URL }}
+          API_BASE_URL=${{ secrets.API_BASE_URL }}
+          USER_USERNAME=${{ secrets.USER_USERNAME }}
+          USER_PASSWORD=${{ secrets.USER_PASSWORD }}
+          DEFAULT_TIMEOUT=30000
+          API_TIMEOUT=10000
+          EOF
+
+      - name: Run tests with selected tags
+        run: npx playwright test --grep "${{ github.event.inputs.testTags }}"
+
+      - name: Generate Allure Report
+        if: always()
+        run: npm run allure:static
+
+      - name: Publish Test Results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results
+          path: allure-report/
+          retention-days: 30

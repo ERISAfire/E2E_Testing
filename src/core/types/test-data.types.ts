@@ -35,17 +35,17 @@ export interface UserData {
  * Represents basic authentication credentials
  *
  * @remarks
- * A generic interface for login credentials with username and password.
+ * A generic interface for login credentials with email and password.
  *
  * @example
  * const loginCredentials: Credentials = {
- *   username: 'johndoe',
+ *   email: 'johndoe',
  *   password: 'securePassword123'
  * };
  */
 export interface Credentials {
-  /** Username for authentication */
-  username: string;
+  /** email for authentication */
+  email: string;
 
   /** Password for authentication */
   password: string;
@@ -80,7 +80,7 @@ export interface ApiCredentials {
  *
  * @example
  * const standardUser: SauceDemoCredentials = {
- *   username: 'standard_user',
+ *   email: 'standard_user',
  *   password: 'secret_sauce',
  *   type: 'standard'
  * };

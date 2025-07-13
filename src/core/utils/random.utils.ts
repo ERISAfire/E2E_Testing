@@ -47,7 +47,7 @@ export class RandomUtils {
    * @returns A randomly generated email address with an example.com domain
    *
    * @remarks
-   * The email username is generated using {@link StringUtils.generateRandomString}
+   * The email email is generated using {@link StringUtils.generateRandomString}
    *
    * @example
    * // Generate a random email address
@@ -55,7 +55,7 @@ export class RandomUtils {
    * // Possible result: 'x7f2hk3q@example.com'
    */
   static getRandomEmail(): string {
-    const username = StringUtils.generateRandomString(8);
-    return `${username}@example.com`;
+    const email = StringUtils.generateRandomString(8);
+    return `${email}@example.com`;
   }
 }

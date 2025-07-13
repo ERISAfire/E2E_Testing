@@ -29,23 +29,28 @@ interface AuthSelectors {
 export const authSelectors: AuthSelectors = {
   loginForm: {
     /**
-     * Username/email input field
+     * Signin button
      */
-    username: '[data-test="username"]',
+    signinButton: 'button.custom-btn.ls:has-text("Sign In")',
+
+    /**
+     * Email input field
+     */
+    emailInput: '[id="1-email"]',
 
     /**
      * Password input field
      */
-    password: '[data-test="password"]',
+    password: 'input[type="password"][name="password"].auth0-lock-input',
 
     /**
      * Login submit button
      */
-    submitButton: '[data-test="login-button"]',
+    submitButton: 'button.auth0-lock-submit[name="submit"][type="submit"]',
 
     /**
      * Error message container that appears on failed login
      */
-    errorMessage: '[data-test="error"]',
+    errorMessage: '.auth0-global-message',
   },
 };

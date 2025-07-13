@@ -82,7 +82,7 @@ export class EnvConfig {
       apiBaseUrl: this.getRequiredEnv('API_BASE_URL'),
       defaultTimeout: Number(process.env.DEFAULT_TIMEOUT || 30000),
       credentials: {
-        username: this.getRequiredEnv('USER_USERNAME'),
+        email: this.getRequiredEnv('USER_EMAIL'),
         password: this.getRequiredEnv('USER_PASSWORD'),
       },
     };
@@ -142,7 +142,7 @@ export class EnvConfig {
    *
    * @example
    * // Get nested config
-   * const username = config.get<string>('credentials.username');
+   * const email = config.get<string>('credentials.email');
    */
   public get<T>(key: keyof Config | string): T {
     const keys = key.split('.');

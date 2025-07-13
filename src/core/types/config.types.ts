@@ -12,7 +12,7 @@
  *   apiBaseUrl: 'https://api.myapp.com/v1',
  *   defaultTimeout: 5000,
  *   credentials: {
- *     username: 'admin',
+ *     email: 'admin',
  *     password: 'securePassword123'
  *   }
  * };
@@ -48,11 +48,11 @@ export interface Config {
    * Authentication credentials for the application
    *
    * @remarks
-   * Contains username and password for authentication
+   * Contains email and password for authentication
    */
   credentials: {
-    /** Username for authentication */
-    username: string;
+    /** email for authentication */
+    email: string;
 
     /** Password for authentication */
     password: string;

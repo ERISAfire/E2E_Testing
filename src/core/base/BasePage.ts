@@ -12,8 +12,8 @@ import { EnvConfig } from '../../config/env.config';
  * @example
  * // Extending BasePage for a specific page
  * export class LoginPage extends BasePage {
- *   async login(username: string, password: string) {
- *     await this.fill('#username', username);
+ *   async login(email: string, password: string) {
+ *     await this.fill('#email', email);
  *     await this.fill('#password', password);
  *     await this.click('#loginButton');
  *   }
@@ -87,8 +87,8 @@ export class BasePage {
    * Protected method for internal page interactions
    *
    * @example
-   * // Fill username input
-   * await this.fill('#username', 'testuser');
+   * // Fill email input
+   * await this.fill('#email', 'testuser');
    */
   protected async fill(selector: string, value: string): Promise<void> {
     await this.page.fill(selector, value);

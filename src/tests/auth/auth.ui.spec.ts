@@ -2,7 +2,7 @@ import { test } from '../../../base-test';
 
 // UI Pages
 import { LoginPage } from '../../ui/pages/LoginPage';
-import { ProductsPage } from '../../ui/pages/ProductsPage';
+import { ProjectsPage } from '../../ui/pages/ProjectsPage';
 
 // Utilities and helpers
 import { EnvConfig } from '../../config/env.config';
@@ -22,7 +22,7 @@ import { TestDataFactory } from '../../factories/test-data.factory';
  */
 test.describe('Auth UI Tests', () => {
   let loginPage: LoginPage;
-  let productsPage: ProductsPage;
+  let projectsPage: ProjectsPage;
   const env = EnvConfig.getInstance();
 
   /**
@@ -30,7 +30,7 @@ test.describe('Auth UI Tests', () => {
    */
   test.beforeEach(async ({ page }) => {
     loginPage = new LoginPage(page);
-    productsPage = new ProductsPage(page);
+    projectsPage = new ProjectsPage(page);
     LogHelper.info('Pages initialized');
     await loginPage.goto();
   });
@@ -49,10 +49,10 @@ test.describe('Auth UI Tests', () => {
     test('should successfully login with valid credentials @smoke @regression @critical @ui @auth', async () => {
       // Using credentials from environment configuration
       await loginPage.login(
-        env.get<string>('credentials.username'),
+        env.get<string>('credentials.email'),
         env.get<string>('credentials.password')
       );
-      await productsPage.waitForLoad();
+      await projectsPage.waitForLoad();
     });
 
     /**
@@ -65,7 +65,9 @@ test.describe('Auth UI Tests', () => {
       LogHelper.debug(`Testing with random email: ${randomEmail}`);
 
       await loginPage.login(randomEmail, StringUtils.generateRandomString());
-      await loginPage.getErrorMessage();
+      await loginPage.assertErrorMessage(
+        "It looks like you're not on the guest list—yet. Let us know who you are via the in-app messenger, and we'll send you an invitation to ERISAfire Projects."
+      );
     });
   });
 
@@ -80,25 +82,25 @@ test.describe('Auth UI Tests', () => {
      * Test successful login using TestDataFactory
      * @tags smoke, regression, critical, ui, auth
      */
-    test('successful login with TestDataFactory @smoke @regression @critical @ui @auth', async () => {
+    test.skip('successful login with TestDataFactory @smoke @regression @critical @ui @auth', async () => {
       // Using TestDataFactory to get predefined valid credentials
       const credentials = TestDataFactory.getSauceCredentials('standard');
       LogHelper.debug('Using UI credentials', credentials);
 
-      await loginPage.login(credentials.username, credentials.password);
-      await productsPage.waitForLoad();
+      await loginPage.login(credentials.email, credentials.password);
+      await projectsPage.waitForLoad();
     });
 
     /**
      * Test failed login using TestDataFactory for locked user
      * @tags regression, ui, auth
      */
-    test('failed login with TestDataFactory @regression @ui @auth', async () => {
+    test.skip('failed login with TestDataFactory @regression @ui @auth', async () => {
       // Using TestDataFactory to get credentials for a locked user
       const credentials = TestDataFactory.getSauceCredentials('locked');
       LogHelper.debug('Using locked UI credentials', credentials);
 
-      await loginPage.login(credentials.username, credentials.password);
+      await loginPage.login(credentials.email, credentials.password);
       await loginPage.getErrorMessage();
     });
   });

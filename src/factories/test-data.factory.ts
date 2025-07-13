@@ -37,7 +37,7 @@ export class TestDataFactory {
    * Generates credentials for SauceDemo website
    *
    * @param type - The type of user to generate credentials for
-   * @returns Credentials object with username and password
+   * @returns Credentials object with email and password
    *
    * @example
    * // Get standard user credentials
@@ -58,7 +58,7 @@ export class TestDataFactory {
     };
 
     return {
-      username: userTypes[type],
+      email: userTypes[type],
       password: basePassword,
     };
   }

@@ -34,17 +34,19 @@ export class LoginPage extends BasePage {
   /**
    * Performs login with provided credentials
    *
-   * Fills in the username and password fields, then submits the form
+   * Fills in the email and password fields, then submits the form
    *
-   * @param username - The username or email to use
+   * @param email - The email or email to use
    * @param password - The password to use
    * @returns Promise that resolves when login attempt is complete
    *
    * @example
    * await loginPage.login('standard_user', 'secret_sauce');
    */
-  async login(username: string, password: string): Promise<void> {
-    await this.fill(authSelectors.loginForm.username, username);
+  async login(email: string, password: string): Promise<void> {
+    await this.click(authSelectors.loginForm.signinButton);
+    await this.page.waitForSelector(authSelectors.loginForm.emailInput, { timeout: 10000 });
+    await this.fill(authSelectors.loginForm.emailInput, email);
     await this.fill(authSelectors.loginForm.password, password);
     await this.click(authSelectors.loginForm.submitButton);
   }
@@ -62,5 +64,16 @@ export class LoginPage extends BasePage {
     const errorLocator = this.getLocator(authSelectors.loginForm.errorMessage);
     await this.assertions.shouldBeVisible(errorLocator);
     return this.getText(authSelectors.loginForm.errorMessage);
+  }
+
+  /**
+   * Checks that the error message text matches the expected value
+   * @param expectedText - expected error message text
+   */
+  async assertErrorMessage(expectedText: string): Promise<void> {
+    const actualText = await this.getErrorMessage();
+    if (actualText !== expectedText) {
+      throw new Error(`Expected error message "${expectedText}", but got "${actualText}"`);
+    }
   }
 }

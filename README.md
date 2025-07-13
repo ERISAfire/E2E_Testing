@@ -173,7 +173,7 @@ jobs:
           cat > .env << EOF
           BASE_URL=${{ secrets.BASE_URL }}
           API_BASE_URL=${{ secrets.API_BASE_URL }}
-          USER_USERNAME=${{ secrets.USER_USERNAME }}
+          USER_EMAIL=${{ secrets.USER_EMAIL }}
           USER_PASSWORD=${{ secrets.USER_PASSWORD }}
           DEFAULT_TIMEOUT=30000
           API_TIMEOUT=10000
@@ -237,7 +237,7 @@ jobs:
           cat > .env << EOF
           BASE_URL=${{ secrets.BASE_URL }}
           API_BASE_URL=${{ secrets.API_BASE_URL }}
-          USER_USERNAME=${{ secrets.USER_USERNAME }}
+          USER_EMAIL=${{ secrets.USER_EMAIL }}
           USER_PASSWORD=${{ secrets.USER_PASSWORD }}
           DEFAULT_TIMEOUT=30000
           API_TIMEOUT=10000
@@ -425,7 +425,7 @@ BASE_URL=https://www.saucedemo.com
 API_BASE_URL=https://reqres.in/api
 
 # Test Users
-USER_USERNAME=standard_user
+USER_EMAIL=standard_user
 USER_PASSWORD=secret_sauce
 
 # Timeouts
@@ -468,7 +468,7 @@ test.describe('Login UI Tests', () => {
     // Using TestDataFactory to get test credentials
     const credentials = TestDataFactory.getSauceCredentials('standard');
 
-    await loginPage.login(credentials.username, credentials.password);
+    await loginPage.login(credentials.email, credentials.password);
     await productsPage.waitForLoad();
   });
 });

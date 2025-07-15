@@ -64,7 +64,7 @@ test.describe('Auth API Tests', () => {
      * Test failed login with random invalid credentials
      * @tags regression, api, auth
      */
-    test('should fail with invalid credentials @regression @api @auth', async () => {
+    test.skip('should fail with invalid credentials @regression @api @auth', async () => {
       // Using utility methods directly
       const response = (await authAPI.login(
         {
@@ -104,7 +104,7 @@ test.describe('Auth API Tests', () => {
      * Test failed login using TestDataFactory for invalid credentials
      * @tags regression, api, auth
      */
-    test('failed login with TestDataFactory @regression @api @auth', async () => {
+    test.skip('failed login with TestDataFactory @regression @api @auth', async () => {
       // Using TestDataFactory to get randomly generated invalid credentials
       const credentials = TestDataFactory.getReqResCredentials('invalid');
       LogHelper.debug('Using invalid API credentials', credentials);

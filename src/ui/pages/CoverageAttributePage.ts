@@ -15,6 +15,7 @@ import {
   getCoverageAttributeDeleteMenuItem,
   getDeleteConfirmButton,
   getDeleteSuccessToast,
+  getCancelButton,
 } from '../selectors/coverageAttribute.selectors';
 
 export class CoverageAttributePage {
@@ -54,5 +55,28 @@ export class CoverageAttributePage {
     await getCoverageAttributeDeleteMenuItem(this.page).click();
     await getDeleteConfirmButton(this.page).click();
     await expect(getDeleteSuccessToast(this.page)).toBeVisible();
+  }
+
+  async assertValidationOnEmptySave(): Promise<void> {
+    // Explicitly scroll the page to the top
+    await this.page.evaluate(() => window.scrollTo(0, 0));
+    const createButton = getAddNewButton(this.page);
+    await createButton.click();
+
+    // Simulate losing focus for both inputs
+    await this.page.getByRole('textbox', { name: 'Coverage attribute name' }).click();
+    await this.page.getByRole('heading', { name: 'New coverage attribute' }).click();
+    await this.page.getByRole('textbox', { name: 'Coverage attribute color *' }).click();
+    await this.page.getByRole('heading', { name: 'New coverage attribute' }).click();
+
+    // Validation message check
+    await expect(this.page.getByText('Attribute name is required')).toBeVisible();
+    await expect(this.page.getByText('Attribute color is required')).toBeVisible();
+
+    // Disabled button check
+    const saveButton = getAddButton(this.page);
+    await expect(saveButton).toBeDisabled();
+
+    await getCancelButton(this.page).click();
   }
 }

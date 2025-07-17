@@ -88,6 +88,9 @@ npm run test:ui
 
 # Critical Path Tests
 npm run test:critical
+
+# Negative Tests
+npm run test:negative
 ```
 
 ## 🔍 Test Filtering

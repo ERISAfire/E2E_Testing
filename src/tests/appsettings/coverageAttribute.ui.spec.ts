@@ -23,5 +23,8 @@ test.describe('Coverage Attribute UI', () => {
 
     // Delete
     await coverageAttributePage.deleteCoverageAttribute();
+
+    // Negative: validation check on empty form
+    await coverageAttributePage.assertValidationOnEmptySave();
   });
 });

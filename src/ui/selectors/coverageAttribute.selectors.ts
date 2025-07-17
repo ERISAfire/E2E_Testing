@@ -30,6 +30,9 @@ export const getCoverageAttributeRowActionsButton = (page: Page, name: string): 
 export const getCoverageAttributeEditMenuItem = (page: Page): Locator =>
   page.getByRole('menuitem', { name: 'Edit' });
 
+export const getCancelButton = (page: Page): Locator =>
+  page.getByRole('button', { name: 'Cancel' });
+
 export const getSaveButton = (page: Page): Locator => page.getByRole('button', { name: 'Save' });
 
 export const getUpdateSuccessToast = (page: Page): Locator =>

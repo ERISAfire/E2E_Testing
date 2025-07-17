@@ -1,11 +1,11 @@
 import { test, expect } from '@playwright/test';
 
-import * as dotenv from 'dotenv';
-dotenv.config();
+import { EnvConfig } from '../../config/env.config';
 
-// Base URL and token from .env
-const API_BASE_URL = process.env.API_BASE_URL!;
-const API_BEARER_TOKEN = process.env.API_BEARER_TOKEN!;
+// Get config singleton
+const config = EnvConfig.getInstance();
+const API_BASE_URL = config.getConfig().apiBaseUrl;
+const API_BEARER_TOKEN = config.getConfig().apiBearerToken;
 
 // Endpoint for coverage attributes
 const COVERAGE_ATTRIBUTES_PATH = '/v1/coverage-attributes';

@@ -6,7 +6,6 @@ import { ProjectsPage } from '../../ui/pages/ProjectsPage';
 
 // Utilities and helpers
 import { EnvConfig } from '../../config/env.config';
-import { LogHelper } from '../../core/helpers/log.helper';
 import { RandomUtils } from '../../core/utils/random.utils';
 import { StringUtils } from '../../core/utils/string.utils';
 import { TestDataFactory } from '../../factories/test-data.factory';
@@ -31,7 +30,6 @@ test.describe('Auth UI Tests', () => {
   test.beforeEach(async ({ page }) => {
     loginPage = new LoginPage(page);
     projectsPage = new ProjectsPage(page);
-    LogHelper.info('Pages initialized');
     await loginPage.goto();
   });
 
@@ -62,7 +60,6 @@ test.describe('Auth UI Tests', () => {
     test('should fail with invalid credentials @regression @ui @auth', async () => {
       // Using utility methods to generate random credentials
       const randomEmail = RandomUtils.getRandomEmail();
-      LogHelper.debug(`Testing with random email: ${randomEmail}`);
 
       await loginPage.login(randomEmail, StringUtils.generateRandomString());
       await loginPage.assertErrorMessage(
@@ -85,7 +82,6 @@ test.describe('Auth UI Tests', () => {
     test.skip('successful login with TestDataFactory @smoke @regression @critical @ui @auth', async () => {
       // Using TestDataFactory to get predefined valid credentials
       const credentials = TestDataFactory.getSauceCredentials('standard');
-      LogHelper.debug('Using UI credentials', credentials);
 
       await loginPage.login(credentials.email, credentials.password);
       await projectsPage.waitForLoad();
@@ -98,7 +94,6 @@ test.describe('Auth UI Tests', () => {
     test.skip('failed login with TestDataFactory @regression @ui @auth', async () => {
       // Using TestDataFactory to get credentials for a locked user
       const credentials = TestDataFactory.getSauceCredentials('locked');
-      LogHelper.debug('Using locked UI credentials', credentials);
 
       await loginPage.login(credentials.email, credentials.password);
       await loginPage.getErrorMessage();

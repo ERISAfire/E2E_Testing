@@ -85,6 +85,7 @@ export class EnvConfig {
         email: this.getRequiredEnv('USER_EMAIL'),
         password: this.getRequiredEnv('USER_PASSWORD'),
       },
+      apiBearerToken: this.getRequiredEnv('API_BEARER_TOKEN'),
     };
 
     return config;

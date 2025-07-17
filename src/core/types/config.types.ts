@@ -57,4 +57,9 @@ export interface Config {
     /** Password for authentication */
     password: string;
   };
+
+  /**
+   * Bearer token for API authentication
+   */
+  apiBearerToken: string;
 }

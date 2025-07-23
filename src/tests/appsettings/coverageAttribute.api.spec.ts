@@ -14,73 +14,70 @@ const COVERAGE_ATTRIBUTES_URL = `${API_BASE_URL}${COVERAGE_ATTRIBUTES_PATH}`;
 // Example of creating a coverage attribute
 const coverageAttributePayload = {
   name: 'Label',
-  color: '#999999',
+  color: '15710d',
 };
 
 let createdId: string;
 
-// NEGATIVE: Missing required fields
-
-test('POST /coverage-attributes - should fail with missing required fields @negative @regression @api @coverageAttribute', async ({
-  request,
-}) => {
-  const response = await request.post(COVERAGE_ATTRIBUTES_URL, {
-    headers: {
-      Authorization: `Bearer ${API_BEARER_TOKEN}`,
-      'Content-Type': 'application/json',
-    },
-    data: {}, // Empty payload
-  });
-  expect(response.status()).toBe(400);
-  const body = await response.json();
-  expect(body).toMatchObject({
-    statusCode: 400,
-    message: 'Validation error',
-    error: 'Bad Request',
-  });
-  expect(Array.isArray(body.subErrors)).toBe(true);
-  expect(body.subErrors).toEqual(
-    expect.arrayContaining([
-      'name must be shorter than or equal to 54 characters',
-      'name must be longer than or equal to 3 characters',
-      'name must be a string',
-      'name should not be empty',
-      'color must be a hexadecimal color',
-      'color must be a string',
-    ])
-  );
-});
-
-// NEGATIVE: Invalid color format
-
-test('POST /coverage-attributes - should fail with invalid color format @negative @regression @api @coverageAttribute', async ({
-  request,
-}) => {
-  const response = await request.post(COVERAGE_ATTRIBUTES_URL, {
-    headers: {
-      Authorization: `Bearer ${API_BEARER_TOKEN}`,
-      'Content-Type': 'application/json',
-    },
-    data: {
-      name: 'Invalid Color',
-      color: 'not-a-color',
-    },
-  });
-  expect(response.status()).toBe(400);
-  const body = await response.json();
-  expect(body).toMatchObject({
-    statusCode: 400,
-    message: 'Validation error',
-    error: 'Bad Request',
-  });
-  expect(Array.isArray(body.subErrors)).toBe(true);
-  expect(body.subErrors).toEqual(expect.arrayContaining(['color must be a hexadecimal color']));
-});
-
-// POST
-// Create coverage attribute
-
 test.describe('Coverage Attribute API', () => {
+  // NEGATIVE: Missing required fields
+  test('POST /coverage-attributes - should fail with missing required fields @negative @regression @api @coverageAttribute', async ({
+    request,
+  }) => {
+    const response = await request.post(COVERAGE_ATTRIBUTES_URL, {
+      headers: {
+        Authorization: `Bearer ${API_BEARER_TOKEN}`,
+        'Content-Type': 'application/json',
+      },
+      data: {}, // Empty payload
+    });
+    expect(response.status()).toBe(400);
+    const body = await response.json();
+    expect(body).toMatchObject({
+      statusCode: 400,
+      message: 'Validation error',
+      error: 'Bad Request',
+    });
+    expect(Array.isArray(body.subErrors)).toBe(true);
+    expect(body.subErrors).toEqual(
+      expect.arrayContaining([
+        'name must be shorter than or equal to 54 characters',
+        'name must be longer than or equal to 3 characters',
+        'name must be a string',
+        'name should not be empty',
+        'color must be a hexadecimal color',
+        'color must be a string',
+      ])
+    );
+  });
+
+  // NEGATIVE: Invalid color format
+  test('POST /coverage-attributes - should fail with invalid color format @negative @regression @api @coverageAttribute', async ({
+    request,
+  }) => {
+    const response = await request.post(COVERAGE_ATTRIBUTES_URL, {
+      headers: {
+        Authorization: `Bearer ${API_BEARER_TOKEN}`,
+        'Content-Type': 'application/json',
+      },
+      data: {
+        name: 'Invalid Color',
+        color: 'not-a-color',
+      },
+    });
+    expect(response.status()).toBe(400);
+    const body = await response.json();
+    expect(body).toMatchObject({
+      statusCode: 400,
+      message: 'Validation error',
+      error: 'Bad Request',
+    });
+    expect(Array.isArray(body.subErrors)).toBe(true);
+    expect(body.subErrors).toEqual(expect.arrayContaining(['color must be a hexadecimal color']));
+  });
+
+  // POST
+  // Create coverage attribute
   test('POST /coverage-attributes - create @smoke @regression @critical @regression @api @coverageAttribute', async ({
     request,
   }) => {

@@ -25,7 +25,7 @@ interface AuthSelectors {
  */
 export const authSelectors: AuthSelectors = {
   loginForm: {
-    signinButton: 'button.custom-btn.ls:has-text("Sign In")',
+    signinButton: 'button:has-text("Log in")',
     emailInput: '[id="1-email"]',
     password: 'input[type="password"][name="password"].auth0-lock-input',
     submitButton: 'button.auth0-lock-submit[name="submit"][type="submit"]',

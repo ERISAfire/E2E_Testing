@@ -16,6 +16,12 @@ export default defineConfig({
   testDir: './src/tests',
 
   /**
+   * Global test timeout in milliseconds
+   * Set to 2 minutes for complex UI tests with multiple operations
+   */
+  timeout: 60000,
+
+  /**
    * Test reporters configuration
    * - list: Standard console reporter showing test progress
    * - allure-playwright: Generates Allure report data

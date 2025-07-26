@@ -2,7 +2,7 @@ import { test } from '@playwright/test';
 import 'dotenv/config';
 import { CoverageAttributePage } from '../../ui/pages/CoverageAttributePage';
 
-test.describe('Coverage Attribute UI', () => {
+test.describe('Coverage Attribute UI E2E', () => {
   test('should create, edit and delete coverage attribute via UI @smoke @regression @critical @ui @coverageAttribute @e2e', async ({
     page,
   }) => {

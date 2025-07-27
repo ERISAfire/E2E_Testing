@@ -12,16 +12,10 @@ This comprehensive test automation framework is designed for robust end-to-end t
   - Support for UI, API, Integration, and E2E tests per feature
   - Comprehensive tag-based filtering
 
-- **Demo Implementation**
-
-  - UI tests with SauceDemo.com
-  - API tests with ReqRes.in
-  - Ready-to-use examples
-
 - **Robust Test Architecture**
 
   - Page Object Pattern for UI
-  - API client architecture with schema validation
+  - API client architecture
   - Custom base test with automatic Allure attachments
   - Comprehensive helper utilities
 
@@ -292,11 +286,6 @@ jobs:
 
 ```
 src/
-├── api/
-│   ├── services/       # API service classes
-│   ├── schemas/        # JSON schemas for validation
-│   └── types/          # API type definitions
-│
 ├── config/
 │   └── env.config.ts   # Environment configuration
 │
@@ -304,8 +293,6 @@ src/
 │   ├── base/
 │   │   ├── BasePage.ts         # Base page object
 │   │   ├── BaseAPI.ts          # Base API client
-│   │   └── BaseAssertions.ts   # Custom assertions
-│   ├── helpers/       # Helper utilities
 │   ├── utils/         # Utility functions
 │   └── types/         # Core type definitions
 │
@@ -316,10 +303,9 @@ src/
 │   ├── auth/           # Authentication tests
 │   │   ├── auth.api.spec.ts
 │   │   ├── auth.ui.spec.ts
-│   │   ├── auth.int.spec.ts
-│   │   └── auth.e2e.spec.ts
-│   └── products/       # Product-related tests
-│       ├── products.api.spec.ts
+│   └── appsettings/       # Product-related tests
+│       ├── coverageAttribute.api.spec.ts
+│       ├── coverageType.ui.spec.ts
 │       └── ...
 │
 └── ui/
@@ -424,15 +410,15 @@ Environment variables are defined in `.env`:
 
 ```
 # Base URLs
-BASE_URL=https://www.saucedemo.com
-API_BASE_URL=https://reqres.in/api
+BASE_URL=https://frontend-stage01.erisafire-internal.dev/signin
+API_BASE_URL=https://backend-stage01.erisafire-internal.dev
 
 # Test Users
-USER_EMAIL=standard_user
-USER_PASSWORD=secret_sauce
+USER_EMAIL=iuliia.kariuk+automation@honeycombsoft.com
+USER_PASSWORD=-/-
 
 # Timeouts
-DEFAULT_TIMEOUT=30000
+DEFAULT_TIMEOUT=60000
 API_TIMEOUT=10000
 ```
 
@@ -444,8 +430,6 @@ The framework supports four test types, organized by feature:
 
 - **UI Tests**: Browser-based testing with Page Objects (`.ui.spec.ts`)
 - **API Tests**: Direct API testing with service classes (`.api.spec.ts`)
-- **Integration Tests**: Combined UI and API testing (`.int.spec.ts`)
-- **E2E Tests**: End-to-end workflows (`.e2e.spec.ts`)
 
 ### Creating UI Tests
 
@@ -722,7 +706,6 @@ Use tags to categorize tests:
 
   - `@ui` - UI tests
   - `@api` - API tests
-  - `@int` - Integration tests
   - `@e2e` - End-to-end tests
 
 - **Test Levels**
@@ -730,10 +713,12 @@ Use tags to categorize tests:
   - `@smoke` - Critical path tests (subset of regression)
   - `@regression` - Full regression suite
   - `@critical` - Business-critical tests
+  - `@negative` - Negative tests
 
 - **Feature Areas**
   - `@auth` - Authentication-related tests
-  - `@products` - Product-related tests
+  - `@coverageAttribute` - Coverage attribute tests
+  - `@coverageType` - Coverage type tests
 
 ## 🤝 Contributing
 

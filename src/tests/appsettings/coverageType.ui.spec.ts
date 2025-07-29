@@ -10,7 +10,7 @@ test.describe('Coverage Types UI E2E', () => {
     await loginPage.goto();
     await loginPage.login(process.env.USER_EMAIL as string, process.env.USER_PASSWORD as string);
     const coverageTypePage = new CoverageTypePage(page);
-    // Створення нового coverage type
+    // Create coverage type
     await coverageTypePage.createCoverageType({
       name: 'Auto_Test',
       iconOption: '1',

@@ -1,21 +1,4 @@
-/**
- * Interface for a group of related selectors
- *
- * A collection of key-value pairs where each key is a semantic element name
- * and each value is a CSS selector string.
- */
-interface Selector {
-  [key: string]: string;
-}
-
-/**
- * Interface defining the structure of authentication selectors
- *
- * Contains groups of selectors for different authentication-related UI components.
- */
-interface AuthSelectors {
-  loginForm: Selector;
-}
+import { Page, Locator } from '@playwright/test';
 
 /**
  * Authentication selectors
@@ -23,12 +6,26 @@ interface AuthSelectors {
  * Centralized collection of all selectors used for authentication UI components,
  * organized into logical groups for better maintainability.
  */
-export const authSelectors: AuthSelectors = {
-  loginForm: {
-    signinButton: 'button:has-text("Log in")',
-    emailInput: '[id="1-email"]',
-    password: 'input[type="password"][name="password"].auth0-lock-input',
-    submitButton: 'button.auth0-lock-submit[name="submit"][type="submit"]',
-    errorMessage: '.auth0-global-message',
-  },
-};
+export const getSignInButton = (page: Page): Locator =>
+  page.getByRole('button', { name: 'Log in' });
+
+export const getEmailInput = (page: Page): Locator => page.locator('[id="1-email"]');
+
+export const getPasswordInput = (page: Page): Locator =>
+  page.locator('input[type="password"][name="password"].auth0-lock-input');
+
+export const getSubmitButton = (page: Page): Locator =>
+  page.locator('button.auth0-lock-submit[name="submit"][type="submit"]');
+
+export const getErrorMessage = (page: Page): Locator => page.locator('.auth0-global-message');
+
+export const getForgotPasswordLink = (page: Page): Locator =>
+  page.getByRole('link', { name: "Don't remember your password?" });
+
+export const getForgotPasswordEmailInput = (page: Page): Locator =>
+  page.getByRole('textbox', { name: 'Email' });
+
+export const getSendEmailButton = (page: Page): Locator =>
+  page.getByRole('button', { name: 'Send email' });
+
+export const getSuccessMessage = (page: Page): Locator => page.locator('.auth0-global-message');

@@ -1,4 +1,5 @@
 import { test } from '../../../base-test';
+import { expect } from '@playwright/test';
 
 // UI Pages
 import { LoginPage } from '../../ui/pages/LoginPage';
@@ -8,16 +9,11 @@ import { ProjectsPage } from '../../ui/pages/ProjectsPage';
 import { EnvConfig } from '../../config/env.config';
 import { RandomUtils } from '../../core/utils/random.utils';
 import { StringUtils } from '../../core/utils/string.utils';
-import { TestDataFactory } from '../../factories/test-data.factory';
 
 /**
  * Test suite for Auth UI
  *
- * This suite demonstrates two approaches to test data management:
- * 1. Using direct values and environment configuration
- * 2. Using TestDataFactory pattern
- *
- * Both approaches are valid and shown for demonstration purposes.
+ * This suite demonstrates test data management using direct values and environment configuration.
  */
 test.describe('Auth UI Tests', () => {
   let loginPage: LoginPage;
@@ -34,12 +30,12 @@ test.describe('Auth UI Tests', () => {
   });
 
   /**
-   * Approach 1: Using environment configuration and utility methods
+   * Using environment configuration and utility methods
    *
    * This approach uses environment variables for credentials
    * and utility methods for generating random data.
    */
-  test.describe('Approach 1: Environment configuration and utilities', () => {
+  test.describe('Login Tests', () => {
     /**
      * Test successful login using environment credentials
      * @tags smoke, regression, critical, ui, auth
@@ -66,37 +62,22 @@ test.describe('Auth UI Tests', () => {
         "It looks like you're not on the guest list—yet. Let us know who you are via the in-app messenger, and we'll send you an invitation to ERISAfire Projects."
       );
     });
-  });
-
-  /**
-   * Approach 2: Using TestDataFactory pattern
-   *
-   * This approach uses the TestDataFactory to abstract test data creation
-   * and provide a consistent interface for getting test data.
-   */
-  test.describe('Approach 2: TestDataFactory pattern', () => {
-    /**
-     * Test successful login using TestDataFactory
-     * @tags smoke, regression, critical, ui, auth
-     */
-    test.skip('successful login with TestDataFactory @smoke @regression @critical @ui @auth', async () => {
-      // Using TestDataFactory to get predefined valid credentials
-      const credentials = TestDataFactory.getSauceCredentials('standard');
-
-      await loginPage.login(credentials.email, credentials.password);
-      await projectsPage.waitForLoad();
-    });
 
     /**
-     * Test failed login using TestDataFactory for locked user
-     * @tags regression, ui, auth
+     * Test password reset functionality
+     * @tags regression, ui, auth, password-reset
      */
-    test.skip('failed login with TestDataFactory @regression @ui @auth', async () => {
-      // Using TestDataFactory to get credentials for a locked user
-      const credentials = TestDataFactory.getSauceCredentials('locked');
+    test('should allow password reset for existing email @regression @ui @auth @password-reset', async () => {
+      const testEmail = 'iuliia.kariuk+automation@honeycombsoft.com';
 
-      await loginPage.login(credentials.email, credentials.password);
-      await loginPage.getErrorMessage();
+      // Request password reset
+      await loginPage.requestPasswordReset(testEmail);
+
+      // Verify the success message
+      const successMessage = await loginPage.getPasswordResetSuccessMessage();
+      expect(successMessage).toContain(
+        "If there's a user account with that email, we will send you an email to reset your password."
+      );
     });
   });
 });

@@ -6,7 +6,17 @@
  * It follows the Page Object design pattern for better maintainability.
  */
 import { BasePage } from '../../core/base/BasePage';
-import { authSelectors } from '../selectors/auth.selectors';
+import {
+  getSignInButton,
+  getEmailInput,
+  getPasswordInput,
+  getSubmitButton,
+  getErrorMessage as getErrorMessageLocator,
+  getForgotPasswordLink,
+  getForgotPasswordEmailInput,
+  getSendEmailButton,
+  getSuccessMessage,
+} from '../selectors/auth.selectors';
 import type { Page } from '@playwright/test';
 
 export class LoginPage extends BasePage {
@@ -41,14 +51,14 @@ export class LoginPage extends BasePage {
    * @returns Promise that resolves when login attempt is complete
    *
    * @example
-   * await loginPage.login('standard_user', 'secret_sauce');
+   * await loginPage.login('user@example.com', 'password');
    */
   async login(email: string, password: string): Promise<void> {
-    await this.click(authSelectors.loginForm.signinButton);
-    await this.page.waitForSelector(authSelectors.loginForm.emailInput, { timeout: 10000 });
-    await this.fill(authSelectors.loginForm.emailInput, email);
-    await this.fill(authSelectors.loginForm.password, password);
-    await this.click(authSelectors.loginForm.submitButton);
+    await (await getSignInButton(this.page)).click();
+    await this.page.waitForSelector('[id="1-email"]', { timeout: 10000 });
+    await (await getEmailInput(this.page)).fill(email);
+    await (await getPasswordInput(this.page)).fill(password);
+    await (await getSubmitButton(this.page)).click();
   }
 
   /**
@@ -61,9 +71,9 @@ export class LoginPage extends BasePage {
    * console.log(`Login failed: ${errorMessage}`);
    */
   async getErrorMessage(): Promise<string> {
-    const errorLocator = this.getLocator(authSelectors.loginForm.errorMessage);
+    const errorLocator = getErrorMessageLocator(this.page);
     await this.assertions.shouldBeVisible(errorLocator);
-    return this.getText(authSelectors.loginForm.errorMessage);
+    return errorLocator.textContent() as Promise<string>;
   }
 
   /**
@@ -75,5 +85,42 @@ export class LoginPage extends BasePage {
     if (actualText !== expectedText) {
       throw new Error(`Expected error message "${expectedText}", but got "${actualText}"`);
     }
+  }
+
+  /**
+   * Initiates the password reset process for a given email
+   *
+   * @param email - The email address to send the password reset to
+   * @returns Promise that resolves when the password reset request is submitted
+   *
+   * @example
+   * await loginPage.requestPasswordReset('user@example.com');
+   */
+  async requestPasswordReset(email: string): Promise<void> {
+    // Click on the login button to show the login form if needed
+    await getSignInButton(this.page).click();
+
+    // Click on the forgot password link
+    await getForgotPasswordLink(this.page).click();
+
+    // Fill in the email field
+    await getForgotPasswordEmailInput(this.page).fill(email);
+
+    // Click the send email button
+    await getSendEmailButton(this.page).click();
+  }
+
+  /**
+   * Gets the success message text after requesting a password reset
+   *
+   * @returns Promise that resolves to the success message text
+   *
+   * @example
+   * const message = await loginPage.getPasswordResetSuccessMessage();
+   */
+  async getPasswordResetSuccessMessage(): Promise<string> {
+    const messageLocator = getSuccessMessage(this.page);
+    await this.assertions.shouldBeVisible(messageLocator);
+    return messageLocator.textContent() as Promise<string>;
   }
 }

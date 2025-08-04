@@ -1,0 +1,41 @@
+import { test } from '@playwright/test';
+import { LoginPage } from '../../ui/pages/LoginPage';
+import { ProjectTemplatePage } from '../../ui/pages/ProjectTemplatePage';
+import { DateUtils } from '@core/utils';
+
+test.describe('Project Templates UI E2E', () => {
+  test('should create, edit and delete a project template @regression @ui @e2e @projectTemplate', async ({
+    page,
+  }) => {
+    const loginPage = new LoginPage(page);
+    await loginPage.goto();
+    await loginPage.login(process.env.USER_EMAIL as string, process.env.USER_PASSWORD as string);
+
+    const projectTemplatePage = new ProjectTemplatePage(page);
+    const templateName = `Auto_Test_${DateUtils.getCurrentDateFormatted('DDMMYYYY')}`;
+    const updatedTemplateName = `${templateName}_Updated`;
+
+    // 1. Create project template
+    await projectTemplatePage.createProjectTemplate({
+      name: templateName,
+      status: 'Active',
+      color: '#123456',
+      trelloCardTemplate: 'Automation_Tests',
+      note: {
+        title: 'Test Note',
+        description: 'This is a test note',
+      },
+    });
+
+    // 2. Edit project template
+    await projectTemplatePage.editTemplate(templateName, {
+      name: updatedTemplateName,
+      status: 'Draft',
+      trelloCardTemplate: 'Automation_Tests_Updated',
+      color: '#9ea025',
+    });
+
+    // 3. Delete the template
+    await projectTemplatePage.deleteTemplate(updatedTemplateName);
+  });
+});

@@ -1,6 +1,6 @@
 import { Page, expect } from '@playwright/test';
 import {
-  getAppSettingsLink,
+  getAppSettings,
   getCoverageTypesCreateButton,
   getAddNewCoverageTypeButton,
   getCoverageTypeNameInput,
@@ -36,7 +36,7 @@ export class CoverageTypePage {
     iconOption: string;
     rowRadios: Array<{ row: string; index: number }>;
   }): Promise<void> {
-    await getAppSettingsLink(this.page).click();
+    await getAppSettings(this.page).click();
     await getCoverageTypesCreateButton(this.page).click();
     await getAddNewCoverageTypeButton(this.page).click();
     await getCoverageTypeNameInput(this.page).click();

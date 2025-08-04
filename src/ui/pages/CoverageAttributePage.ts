@@ -1,6 +1,6 @@
 import { Page, expect } from '@playwright/test';
 import {
-  getAppSettingsLink,
+  getAppSettings,
   getCoverageAttributeCreateButton,
   getAddNewButton,
   getCoverageAttributeNameInput,
@@ -22,7 +22,7 @@ export class CoverageAttributePage {
   constructor(private page: Page) {}
 
   async createCoverageAttribute({ name, color }: { name: string; color: string }): Promise<void> {
-    await getAppSettingsLink(this.page).click();
+    await getAppSettings(this.page).click();
     await getCoverageAttributeCreateButton(this.page).click();
     await getAddNewButton(this.page).click();
     await getCoverageAttributeNameInput(this.page).fill(name);

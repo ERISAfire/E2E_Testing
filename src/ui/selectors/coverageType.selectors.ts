@@ -1,6 +1,6 @@
 import { Page, Locator } from '@playwright/test';
 
-export const getAppSettingsLink = (page: Page): Locator => page.getByLabel('App Settings');
+export const getAppSettings = (page: Page): Locator => page.getByLabel('App Settings');
 
 export const getCoverageTypesCreateButton = (page: Page): Locator =>
   page.getByRole('button', { name: 'Coverage Types Create, edit' });
@@ -30,13 +30,19 @@ export const getCoverageTypeRowActionsButton = (page: Page, name: string): Locat
   page.locator('tr', { hasText: name }).locator('button[aria-label="row-actions"]');
 
 export const getCoverageTypeEnabledRowActionsButton = (page: Page, name: string): Locator =>
-  page.locator('tr', { hasText: name }).locator('button[aria-label="row-actions"]:not([disabled])');
+  page
+    .locator('tr', { hasText: name })
+    .locator('button[aria-label="row-actions"]:not([disabled])')
+    .first();
 
 export const getCoverageTypeArchivedTab = (page: Page): Locator =>
   page.getByRole('tab', { name: 'Archived' });
 
 export const getCoverageTypeArchivedRowActionsButton = (page: Page, name: string): Locator =>
-  page.locator('tr', { hasText: name }).locator('button[aria-label="row-actions"]:not([disabled])');
+  page
+    .locator('tr', { hasText: name })
+    .locator('button[aria-label="row-actions"]:not([disabled])')
+    .first();
 
 export const getCoverageTypeSaveButton = (page: Page): Locator =>
   page.getByRole('button', { name: 'Save' });

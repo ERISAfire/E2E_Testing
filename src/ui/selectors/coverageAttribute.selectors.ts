@@ -1,7 +1,7 @@
 // Selectors for the Coverage Attribute page
 import { Page, Locator } from '@playwright/test';
 
-export const getAppSettingsLink = (page: Page): Locator =>
+export const getAppSettings = (page: Page): Locator =>
   page.getByRole('link', { name: 'App Settings' });
 
 export const getCoverageAttributeCreateButton = (page: Page): Locator =>
@@ -25,7 +25,7 @@ export const getSuccessToast = (page: Page): Locator =>
   page.getByText('Coverage attribute has been');
 
 export const getCoverageAttributeRowActionsButton = (page: Page, name: string): Locator =>
-  page.locator('tr', { hasText: name }).locator('button[aria-label="row-actions"]');
+  page.locator('tr', { hasText: name }).locator('button[aria-label="row-actions"]').first();
 
 export const getCoverageAttributeEditMenuItem = (page: Page): Locator =>
   page.getByRole('menuitem', { name: 'Edit' });

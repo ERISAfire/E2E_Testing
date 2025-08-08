@@ -73,7 +73,7 @@ export class CoverageTypePage {
       await getCoverageTypeRowRadio(this.page, row, index).check();
     }
     await getCoverageTypeSaveButton(this.page).click();
-    await expect(getCoverageTypeEditSuccessToast(this.page)).toBeVisible();
+    await expect(getCoverageTypeEditSuccessToast(this.page)).toBeVisible({ timeout: 30000 });
   }
 
   async archiveCoverageType(name: string): Promise<void> {

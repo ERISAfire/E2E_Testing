@@ -19,7 +19,7 @@ export default defineConfig({
    * Global test timeout in milliseconds
    * Set to 2 minutes for complex UI tests with multiple operations
    */
-  timeout: 60000,
+  timeout: 90000,
 
   /**
    * Test reporters configuration

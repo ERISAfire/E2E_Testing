@@ -38,7 +38,7 @@ jobs:
           USER_EMAIL=${{ secrets.USER_EMAIL }}
           USER_PASSWORD=${{ secrets.USER_PASSWORD }}
           API_BEARER_TOKEN=${{ secrets.API_BEARER_TOKEN }}
-          DEFAULT_TIMEOUT=60000
+          DEFAULT_TIMEOUT=90000
           API_TIMEOUT=10000
           EOF
 

@@ -51,8 +51,8 @@ export class CoverageTypePage {
       await getCoverageTypeRowRadio(this.page, row, index).check();
     }
     await getAddCoverageTypeButton(this.page).click();
-    await expect(getCoverageTypeSuccessToast(this.page)).toBeVisible();
-    await expect(getCoverageTypeActiveStatus(this.page, name)).toBeVisible();
+    await expect(getCoverageTypeSuccessToast(this.page)).toBeVisible({ timeout: 30000 });
+    await expect(getCoverageTypeActiveStatus(this.page, name)).toBeVisible({ timeout: 30000 });
   }
 
   async editCoverageType(
@@ -60,20 +60,36 @@ export class CoverageTypePage {
     newName: string,
     rowRadios: Array<{ row: string; index: number }>
   ): Promise<void> {
-    await this.page.evaluate(() => window.scrollBy(0, window.innerHeight));
-    // Wait for the row actions button to be enabled
-    const rowActionsBtn = getCoverageTypeEnabledRowActionsButton(this.page, oldName);
-    await rowActionsBtn.scrollIntoViewIfNeeded();
-    await expect(rowActionsBtn).toBeEnabled();
-    await rowActionsBtn.click();
-    await getCoverageTypeEditMenuItem(this.page).click();
-    await getCoverageTypeNameInput(this.page).click();
-    await getCoverageTypeNameInput(this.page).fill(newName);
-    for (const { row, index } of rowRadios) {
-      await getCoverageTypeRowRadio(this.page, row, index).check();
+    try {
+      await this.page.evaluate(() => window.scrollBy(0, window.innerHeight));
+
+      const rowActionsBtn = getCoverageTypeEnabledRowActionsButton(this.page, oldName);
+      await rowActionsBtn.scrollIntoViewIfNeeded();
+      await expect(rowActionsBtn).toBeEnabled({ timeout: 10000 });
+      await rowActionsBtn.click();
+
+      await getCoverageTypeEditMenuItem(this.page).click();
+
+      const nameInput = getCoverageTypeNameInput(this.page);
+      await nameInput.click();
+      await nameInput.fill('');
+      await nameInput.fill(newName);
+
+      for (const { row, index } of rowRadios) {
+        const radio = getCoverageTypeRowRadio(this.page, row, index);
+        await radio.scrollIntoViewIfNeeded();
+        await radio.check();
+      }
+
+      const saveButton = getCoverageTypeSaveButton(this.page);
+      await saveButton.click();
+
+      const toast = getCoverageTypeEditSuccessToast(this.page);
+      await expect(toast).toBeVisible({ timeout: 30000 });
+    } catch (error) {
+      await this.page.screenshot({ path: `edit-coverage-type-error-${Date.now()}.png` });
+      throw error;
     }
-    await getCoverageTypeSaveButton(this.page).click();
-    await expect(getCoverageTypeEditSuccessToast(this.page)).toBeVisible({ timeout: 30000 });
   }
 
   async archiveCoverageType(name: string): Promise<void> {

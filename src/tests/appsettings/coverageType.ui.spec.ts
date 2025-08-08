@@ -10,9 +10,13 @@ test.describe('Coverage Types UI E2E', () => {
     await loginPage.goto();
     await loginPage.login(process.env.USER_EMAIL as string, process.env.USER_PASSWORD as string);
     const coverageTypePage = new CoverageTypePage(page);
-    // Create coverage type
+
+    const timestamp = Date.now();
+    const testName = `Auto_Test_${timestamp}`;
+    const updatedTestName = `${testName}_Updated`;
+
     await coverageTypePage.createCoverageType({
-      name: 'Auto_Test',
+      name: testName,
       iconOption: '1',
       rowRadios: [
         { row: '4A', index: 0 },
@@ -24,19 +28,15 @@ test.describe('Coverage Types UI E2E', () => {
         { row: 'After-Tax', index: 1 },
       ],
     });
-    // Edit created coverage type
-    await coverageTypePage.editCoverageType('Auto_Test', 'Auto_Test_Updated', [
+
+    await coverageTypePage.editCoverageType(testName, updatedTestName, [
       { row: '4A', index: 1 },
       { row: '4B', index: 2 },
     ]);
-    // Archive the edited coverage type
-    await coverageTypePage.archiveCoverageType('Auto_Test_Updated');
-    // Unarchive the edited coverage type
-    await coverageTypePage.unarchiveCoverageType('Auto_Test_Updated');
-    // Delete the edited coverage type
-    await coverageTypePage.deleteCoverageType('Auto_Test_Updated');
 
-    // Validation after deletion: creating a new type
+    await coverageTypePage.archiveCoverageType(updatedTestName);
+    await coverageTypePage.unarchiveCoverageType(updatedTestName);
+    await coverageTypePage.deleteCoverageType(updatedTestName);
     await coverageTypePage.assertValidationOnEmptySave();
   });
 });

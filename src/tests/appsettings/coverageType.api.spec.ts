@@ -12,7 +12,7 @@ const COVERAGE_TYPES_URL = `${API_BASE_URL}${COVERAGE_TYPES_PATH}`;
 
 // Example payload
 const coverageTypePayload = {
-  name: 'Auto_Test',
+  name: 'API_Auto_Test',
   icon: 'fal 1',
   attributes: [
     {

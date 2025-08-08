@@ -32,7 +32,7 @@ export class ProjectsPage extends BasePage {
    */
   async waitForLoad(): Promise<void> {
     const titleLocator = this.page.getByText('Projects', { exact: true });
-    await this.assertions.shouldBeVisible(titleLocator);
+    await titleLocator.waitFor({ state: 'visible', timeout: 30000 });
     await this.assertions.shouldHaveText(titleLocator, 'Projects');
   }
 }

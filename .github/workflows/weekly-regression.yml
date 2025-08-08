@@ -45,7 +45,7 @@ jobs:
       - name: Run regression tests
         run: |
           npm run allure:clean
-          npx playwright test --grep @regression
+          npx playwright test --workers=1 --grep @regression
         timeout-minutes: 120
 
       - name: Generate Allure Report

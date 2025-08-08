@@ -50,7 +50,7 @@ jobs:
           EOF
 
       - name: Run tests with selected tags
-        run: npx playwright test --grep "${{ github.event.inputs.testTags }}"
+        run: npx playwright test --workers=1 --grep "${{ github.event.inputs.testTags }}"
 
       - name: Generate Allure Report
         if: always()

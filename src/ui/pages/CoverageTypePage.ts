@@ -9,7 +9,7 @@ import {
   getCoverageTypeRowRadio,
   getAddCoverageTypeButton,
   getCoverageTypeSuccessToast,
-  getCoverageTypeEditSuccessToast,
+  //getCoverageTypeEditSuccessToast,
   getCoverageTypeEnabledRowActionsButton,
   getCoverageTypeSaveButton,
   getCoverageTypeEditMenuItem,
@@ -99,12 +99,12 @@ export class CoverageTypePage {
       const saveButton = getCoverageTypeSaveButton(this.page);
       await saveButton.click();
 
-      // Wait for the success toast
-      const toast = getCoverageTypeEditSuccessToast(this.page);
-      await expect(toast).toBeVisible({ timeout: 30000 });
+      // Toast verification commented out as requested
+      // const toast = getCoverageTypeEditSuccessToast(this.page);
+      // await expect(toast).toBeVisible({ timeout: 30000 });
 
       // Wait for the toast to disappear
-      await toast.waitFor({ state: 'hidden', timeout: 10000 }).catch(() => {});
+      // await toast.waitFor({ state: 'hidden', timeout: 10000 }).catch(() => {});
     } catch (error) {
       // Take a screenshot on failure
       await this.page.screenshot({ path: `edit-coverage-type-error-${Date.now()}.png` });

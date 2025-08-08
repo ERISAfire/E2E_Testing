@@ -26,6 +26,9 @@ export const getAddCoverageTypeButton = (page: Page): Locator =>
 export const getCoverageTypeSuccessToast = (page: Page): Locator =>
   page.getByText('Coverage type has been added.');
 
+export const getCoverageTypeEditSuccessToast = (page: Page): Locator =>
+  page.getByText('Coverage type has been updated.');
+
 export const getCoverageTypeRowActionsButton = (page: Page, name: string): Locator =>
   page.locator('tr', { hasText: name }).locator('button[aria-label="row-actions"]');
 

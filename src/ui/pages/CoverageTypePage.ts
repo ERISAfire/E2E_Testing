@@ -9,6 +9,7 @@ import {
   getCoverageTypeRowRadio,
   getAddCoverageTypeButton,
   getCoverageTypeSuccessToast,
+  getCoverageTypeEditSuccessToast,
   getCoverageTypeEnabledRowActionsButton,
   getCoverageTypeSaveButton,
   getCoverageTypeEditMenuItem,
@@ -72,7 +73,7 @@ export class CoverageTypePage {
       await getCoverageTypeRowRadio(this.page, row, index).check();
     }
     await getCoverageTypeSaveButton(this.page).click();
-    await expect(getCoverageTypeSuccessToast(this.page)).toBeVisible();
+    await expect(getCoverageTypeEditSuccessToast(this.page)).toBeVisible();
   }
 
   async archiveCoverageType(name: string): Promise<void> {

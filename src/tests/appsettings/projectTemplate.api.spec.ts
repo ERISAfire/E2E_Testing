@@ -160,7 +160,7 @@ test.describe.serial('Project Templates API', () => {
   }) => {
     // Arrange
     const templateData = {
-      name: `Test Template ${Date.now()}`,
+      name: `API Test Template ${Date.now()}`,
       color: `#${Math.floor(Math.random() * 16777215).toString(16)}`,
       status: 'active' as const,
       trelloCardId: '639371d1f9968405da28a5ec',

@@ -7,70 +7,36 @@ test.describe('Coverage Types UI E2E', () => {
     page,
   }) => {
     const loginPage = new LoginPage(page);
-    const coverageTypePage = new CoverageTypePage(page);
-
-    // Login
     await loginPage.goto();
     await loginPage.login(process.env.USER_EMAIL as string, process.env.USER_PASSWORD as string);
-
-    // Create coverage type with unique name
-    const timestamp = Date.now();
-    const coverageTypeName = `Auto_Test_${timestamp}`;
-    await test.step('Create coverage type', async () => {
-      await coverageTypePage.createCoverageType({
-        name: coverageTypeName,
-        iconOption: '1',
-        rowRadios: [
-          { row: '4A', index: 0 },
-          { row: '4B', index: 1 },
-          { row: 'Hearing Aid', index: 2 },
-          { row: 'Excepted Benefit', index: 0 },
-          { row: 'Integrated', index: 1 },
-          { row: 'Self-insured', index: 2 },
-          { row: 'After-Tax', index: 1 },
-        ],
-      });
+    const coverageTypePage = new CoverageTypePage(page);
+    // Create coverage type
+    await coverageTypePage.createCoverageType({
+      name: 'Auto_Test',
+      iconOption: '1',
+      rowRadios: [
+        { row: '4A', index: 0 },
+        { row: '4B', index: 1 },
+        { row: 'Hearing Aid', index: 2 },
+        { row: 'Excepted Benefit', index: 0 },
+        { row: 'Integrated', index: 1 },
+        { row: 'Self-insured', index: 2 },
+        { row: 'After-Tax', index: 1 },
+      ],
     });
-
-    // Add a small delay to ensure the UI is stable
-    await page.waitForTimeout(2000);
-
     // Edit created coverage type
-    const updatedName = `${coverageTypeName}_Updated`;
-    await test.step('Edit coverage type', async () => {
-      await coverageTypePage.editCoverageType(coverageTypeName, updatedName, [
-        { row: '4A', index: 1 },
-        { row: '4B', index: 2 },
-      ]);
-    });
-
-    // Add a small delay before archiving
-    await page.waitForTimeout(2000);
-
+    await coverageTypePage.editCoverageType('Auto_Test', 'Auto_Test_Updated', [
+      { row: '4A', index: 1 },
+      { row: '4B', index: 2 },
+    ]);
     // Archive the edited coverage type
-    await test.step('Archive coverage type', async () => {
-      await coverageTypePage.archiveCoverageType(updatedName);
-    });
-
-    // Add a small delay before unarchiving
-    await page.waitForTimeout(2000);
-
+    await coverageTypePage.archiveCoverageType('Auto_Test_Updated');
     // Unarchive the edited coverage type
-    await test.step('Unarchive coverage type', async () => {
-      await coverageTypePage.unarchiveCoverageType(updatedName);
-    });
-
-    // Add a small delay before deleting
-    await page.waitForTimeout(2000);
-
+    await coverageTypePage.unarchiveCoverageType('Auto_Test_Updated');
     // Delete the edited coverage type
-    await test.step('Delete coverage type', async () => {
-      await coverageTypePage.deleteCoverageType(updatedName);
-    });
+    await coverageTypePage.deleteCoverageType('Auto_Test_Updated');
 
-    // Validation after deletion
-    await test.step('Verify validation on empty save', async () => {
-      await coverageTypePage.assertValidationOnEmptySave();
-    });
+    // Validation after deletion: creating a new type
+    await coverageTypePage.assertValidationOnEmptySave();
   });
 });

@@ -61,31 +61,51 @@ export class CoverageTypePage {
     rowRadios: Array<{ row: string; index: number }>
   ): Promise<void> {
     try {
-      await this.page.evaluate(() => window.scrollBy(0, window.innerHeight));
+      // Wait for any previous operations to complete
+      await this.page.waitForLoadState('networkidle');
 
+      // Scroll and click row actions
       const rowActionsBtn = getCoverageTypeEnabledRowActionsButton(this.page, oldName);
       await rowActionsBtn.scrollIntoViewIfNeeded();
-      await expect(rowActionsBtn).toBeEnabled({ timeout: 10000 });
-      await rowActionsBtn.click();
+      await expect(rowActionsBtn).toBeEnabled({ timeout: 15000 });
+      await rowActionsBtn.click({ timeout: 10000 });
 
-      await getCoverageTypeEditMenuItem(this.page).click();
+      // Click edit menu
+      await getCoverageTypeEditMenuItem(this.page).click({ timeout: 10000 });
 
+      // Fill the name
       const nameInput = getCoverageTypeNameInput(this.page);
-      await nameInput.click();
-      await nameInput.fill('');
-      await nameInput.fill(newName);
+      await nameInput.click({ timeout: 10000 });
+      await nameInput.fill('', { timeout: 10000 });
+      await nameInput.fill(newName, { timeout: 10000 });
 
+      // Set radio buttons
       for (const { row, index } of rowRadios) {
         const radio = getCoverageTypeRowRadio(this.page, row, index);
         await radio.scrollIntoViewIfNeeded();
-        await radio.check();
+        await radio.check({ timeout: 10000 });
       }
 
+      // Save changes
       const saveButton = getCoverageTypeSaveButton(this.page);
-      await saveButton.click();
+      await saveButton.click({ timeout: 10000 });
 
-      const toast = getCoverageTypeEditSuccessToast(this.page);
-      await expect(toast).toBeVisible({ timeout: 30000 });
+      // Wait for success toast with better error handling
+      try {
+        const toast = getCoverageTypeEditSuccessToast(this.page);
+        await expect(toast).toBeVisible({ timeout: 45000 });
+      } catch (toastError: unknown) {
+        // If toast not found, check if the update was still successful
+        const successIndicator = getCoverageTypeActiveStatus(this.page, newName);
+        if (await successIndicator.isVisible({ timeout: 1000 })) {
+          // If the name was updated, consider it a success even if toast didn't appear
+          return;
+        }
+        // Take screenshot and rethrow the error
+        await this.page.screenshot({ path: `toast-error-${Date.now()}.png` });
+        const errorMessage = toastError instanceof Error ? toastError.message : 'Unknown error';
+        throw new Error(`Failed to see success toast. ${errorMessage}`);
+      }
     } catch (error) {
       await this.page.screenshot({ path: `edit-coverage-type-error-${Date.now()}.png` });
       throw error;

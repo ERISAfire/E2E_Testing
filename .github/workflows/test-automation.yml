@@ -54,14 +54,16 @@ jobs:
 
       - name: Run API tests
         if: contains(github.event.inputs.testTags, '@api') || !contains(github.event.inputs.testTags, '@ui')
-        run: npx playwright test --workers=2 --grep "${{ github.event.inputs.testTags }}.*@api" --reporter=list,html
+        run: npx playwright test --workers=2 --grep "${{ github.event.inputs.testTags }}.*@api"
         env:
           NODE_OPTIONS: '--experimental-modules --es-module-specifier-resolution=node'
           PLAYWRIGHT_TEST_TIMEOUT: '120000'
 
       - name: Run UI tests
         if: contains(github.event.inputs.testTags, '@ui') || !contains(github.event.inputs.testTags, '@api')
-        run: npx playwright test --workers=2 --grep "${{ github.event.inputs.testTags }}.*@ui"
+        run: |
+          npx tsc --build
+          npx playwright test --workers=2 --grep "${{ github.event.inputs.testTags }}.*@ui"
         env:
           NODE_OPTIONS: '--experimental-modules --es-module-specifier-resolution=node'
           PLAYWRIGHT_TEST_TIMEOUT: '120000'

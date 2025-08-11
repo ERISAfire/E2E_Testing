@@ -1,85 +1,69 @@
-/**
- * Playwright Configuration
- *
- * This file contains the configuration for Playwright test runner,
- * including test directory, reporters, artifact collection settings,
- * and filtering capabilities.
- *
- * @see https://playwright.dev/docs/test-configuration
- */
 import { defineConfig } from '@playwright/test';
 
+// Playwright configuration
 export default defineConfig({
-  /**
-   * Directory where tests are located
-   */
+  // Test directory
   testDir: './src/tests',
 
-  /**
-   * Global test timeout in milliseconds
-   * Set to 2 minutes for complex UI tests with multiple operations
-   */
+  // Run tests in parallel
+  fullyParallel: true,
+
+  // Global test timeout (90 seconds)
   timeout: 90000,
 
-  /**
-   * Test reporters configuration
-   * - list: Standard console reporter showing test progress
-   * - allure-playwright: Generates Allure report data
-   */
+  // Global expect timeout (30 seconds)
+  expect: {
+    timeout: 30000,
+  },
+
+  // Reporters configuration
   reporter: [
     ['list'],
+    ['html', { open: 'never' }],
     [
       'allure-playwright',
       {
-        /**
-         * Include test details in the report
-         */
         detail: true,
-        /**
-         * Output folder for Allure results
-         */
         outputFolder: 'allure-results',
-        /**
-         * Include suite titles in reports
-         */
         suiteTitle: true,
       },
     ],
   ],
 
-  /**
-   * Test execution settings
-   */
+  // Browser settings
   use: {
-    /**
-     * Trace collection:
-     * - 'on-first-retry': Collect trace only when test fails and is retried
-     */
+    // Base URL for all tests
+    baseURL: process.env.BASE_URL || 'http://localhost:3000',
+
+    // Trace collection
     trace: 'on-first-retry',
 
-    /**
-     * Screenshot collection:
-     * - 'only-on-failure': Take screenshots only when tests fail
-     */
+    // Screenshot collection
     screenshot: 'only-on-failure',
 
-    /**
-     * Video recording:
-     * - 'retain-on-failure': Record video but only save it when tests fail
-     */
-    video: 'retain-on-failure',
+    // Video recording
+    video: 'on-first-retry',
   },
 
-  /**
-   * Test filtering using tags
-   * Allows running tests with specific tags via TAGS environment variable
-   *
-   * @example
-   * // Run all tests with @smoke tag
-   * TAGS=@smoke npm test
-   *
-   * // Run tests with both @smoke and @api tags
-   * TAGS=@smoke.*@api npm test
-   */
+  // Test projects
+  projects: [
+    // Setup project (runs first)
+    {
+      name: 'setup',
+      testMatch: /.*\.setup\.ts$/,
+    },
+
+    // Main test project (depends on setup)
+    {
+      name: 'e2e',
+      dependencies: ['setup'],
+    },
+  ],
+
+  // Test file patterns
+  testMatch: '**/*.spec.ts',
+  testIgnore: ['**/node_modules/**', '**/dist/**'],
+
+  // Test filtering using tags from TAGS environment variable
   grep: process.env.TAGS ? new RegExp(process.env.TAGS) : undefined,
 });

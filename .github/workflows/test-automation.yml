@@ -48,11 +48,13 @@ jobs:
           EOF
 
       - name: Build project
-        run: npm run build
+        run: |
+          npm install
+          npm run build
 
       - name: Run API tests
         if: contains(github.event.inputs.testTags, '@api') || !contains(github.event.inputs.testTags, '@ui')
-        run: npx playwright test --workers=2 --grep "${{ github.event.inputs.testTags }}.*@api"
+        run: npx playwright test --workers=2 --grep "${{ github.event.inputs.testTags }}.*@api" --reporter=list,html
         env:
           NODE_OPTIONS: '--experimental-modules --es-module-specifier-resolution=node'
           PLAYWRIGHT_TEST_TIMEOUT: '120000'

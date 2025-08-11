@@ -7,8 +7,8 @@
  * It serves as the foundation for all tests in the framework.
  */
 import { test as baseTest } from '@playwright/test';
-import { attachScreenshotAndVideo } from './helpers/allure-helper';
-import { EnvConfig } from '../config/env.config';
+import { attachScreenshotAndVideo } from './helpers/allure-helper.js';
+import { EnvConfig } from '../config/env.config.js';
 
 // Validate environment variables before any tests run
 // This ensures all required configuration is available

@@ -1,6 +1,6 @@
 import { test } from '@playwright/test';
-import { LoginPage } from '../../ui/pages/LoginPage';
-import { CoverageTypePage } from '../../ui/pages/CoverageTypePage';
+import { LoginPage } from '../../ui/pages/LoginPage.js';
+import { CoverageTypePage } from '../../ui/pages/CoverageTypePage.js';
 
 test.describe('Coverage Types UI E2E', () => {
   test('should create, edit and delete a coverage type @regression @ui @e2e @coverageType', async ({

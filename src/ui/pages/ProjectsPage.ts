@@ -5,7 +5,7 @@
  * methods to interact with its elements and perform actions.
  * It follows the Page Object design pattern for better maintainability.
  */
-import { BasePage } from '../../core/base/BasePage';
+import { BasePage } from '../../core/base/BasePage.js';
 //import { projectsSelectors } from '../../ui/selectors/projects.selectors';
 import type { Page } from '@playwright/test';
 

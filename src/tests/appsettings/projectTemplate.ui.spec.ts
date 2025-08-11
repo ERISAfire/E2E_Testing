@@ -1,7 +1,7 @@
 import { test } from '@playwright/test';
-import { LoginPage } from '../../ui/pages/LoginPage';
-import { ProjectTemplatePage } from '../../ui/pages/ProjectTemplatePage';
-import { DateUtils } from '@core/utils';
+import { LoginPage } from '../../ui/pages/LoginPage.js';
+import { ProjectTemplatePage } from '../../ui/pages/ProjectTemplatePage.js';
+import { DateUtils } from '../../core/utils/date.utils.js';
 
 test.describe('Project Templates UI E2E', () => {
   test('should create, edit and delete a project template @regression @ui @e2e @projectTemplate', async ({

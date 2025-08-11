@@ -49,18 +49,21 @@ jobs:
       - name: Run API regression tests
         run: |
           npm run allure:clean
-          npx playwright test --workers=2 --grep "@regression.*@api" --reporter=line,allure-playwright
+          NODE_OPTIONS='--loader ts-node/esm' npx playwright test --workers=2 --grep "@regression.*@api" --reporter=line,allure-playwright
         timeout-minutes: 60
         env:
-          NODE_OPTIONS: '--experimental-modules --es-module-specifier-resolution=node'
+          NODE_OPTIONS: '--experimental-modules --es-module-specifier-resolution=node --loader ts-node/esm'
           PLAYWRIGHT_TEST_TIMEOUT: '120000'
+          TS_NODE_PROJECT: './tsconfig.json'
 
       - name: Run UI regression tests
-        run: npx playwright test --workers=2 --grep "@regression.*@ui" --reporter=line,allure-playwright
+        run: |
+          NODE_OPTIONS='--loader ts-node/esm' npx playwright test --workers=2 --grep "@regression.*@ui" --reporter=line,allure-playwright
         timeout-minutes: 60
         env:
-          NODE_OPTIONS: '--experimental-modules --es-module-specifier-resolution=node'
+          NODE_OPTIONS: '--experimental-modules --es-module-specifier-resolution=node --loader ts-node/esm'
           PLAYWRIGHT_TEST_TIMEOUT: '120000'
+          TS_NODE_PROJECT: './tsconfig.json'
 
       - name: Generate Allure Report
         if: always()

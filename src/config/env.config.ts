@@ -1,5 +1,10 @@
 import dotenv from 'dotenv';
-import type { Config } from '@core/types/config.types';
+import type { Config } from '../core/types/config.types.js';
+
+declare global {
+  // eslint-disable-next-line no-var
+  var __envConfig: EnvConfig | undefined;
+}
 
 /**
  * Environment Configuration Management Class

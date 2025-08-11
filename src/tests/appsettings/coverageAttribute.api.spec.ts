@@ -1,6 +1,6 @@
 import { test, expect } from '@playwright/test';
 
-import { EnvConfig } from '../../config/env.config';
+import { EnvConfig } from '../../config/env.config.js';
 
 // Get config singleton
 const config = EnvConfig.getInstance();

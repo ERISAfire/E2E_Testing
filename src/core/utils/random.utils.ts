@@ -1,4 +1,4 @@
-import { StringUtils } from './string.utils';
+import { StringUtils } from './string.utils.js';
 
 /**
  * Random Utility Methods

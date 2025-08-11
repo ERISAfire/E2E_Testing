@@ -1,14 +1,14 @@
-import { test } from '../../core/base-test';
+import { test } from '../../core/base-test.js';
 import { expect } from '@playwright/test';
 
 // UI Pages
-import { LoginPage } from '../../ui/pages/LoginPage';
-import { ProjectsPage } from '../../ui/pages/ProjectsPage';
+import { LoginPage } from '../../ui/pages/LoginPage.js';
+import { ProjectsPage } from '../../ui/pages/ProjectsPage.js';
 
 // Utilities and helpers
-import { EnvConfig } from '../../config/env.config';
-import { RandomUtils } from '../../core/utils/random.utils';
-import { StringUtils } from '../../core/utils/string.utils';
+import { EnvConfig } from '../../config/env.config.js';
+import { RandomUtils } from '../../core/utils/random.utils.js';
+import { StringUtils } from '../../core/utils/string.utils.js';
 
 /**
  * Test suite for Auth UI

@@ -1,6 +1,6 @@
 import type { Page, Locator } from '@playwright/test';
-import { BaseAssertions } from './BaseAssertions';
-import { EnvConfig } from '../../config/env.config';
+import { BaseAssertions } from './BaseAssertions.js';
+import { EnvConfig } from '../../config/env.config.js';
 
 /**
  * Base Page class for Playwright-based page object model

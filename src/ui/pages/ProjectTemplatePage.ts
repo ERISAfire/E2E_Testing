@@ -1,5 +1,5 @@
 import { Page, expect } from '@playwright/test';
-import { BasePage } from '../../core/base/BasePage';
+import { BasePage } from '../../core/base/BasePage.js';
 import {
   getAddNewButton,
   getAppSettings,
@@ -23,7 +23,7 @@ import {
   getSuccessToast,
   getTrelloCardTemplateDropdown,
   getTrelloCardTemplateOption,
-} from '../selectors/projectTemplate.selectors';
+} from '../selectors/projectTemplate.selectors.js';
 
 type Status = 'Active' | 'Draft';
 

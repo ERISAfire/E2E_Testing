@@ -5,7 +5,7 @@
  * methods to interact with its elements and perform authentication actions.
  * It follows the Page Object design pattern for better maintainability.
  */
-import { BasePage } from '../../core/base/BasePage';
+import { BasePage } from '../../core/base/BasePage.js';
 import {
   getSignInButton,
   getEmailInput,
@@ -16,7 +16,7 @@ import {
   getForgotPasswordEmailInput,
   getSendEmailButton,
   getSuccessMessage,
-} from '../selectors/auth.selectors';
+} from '../selectors/auth.selectors.js';
 import type { Page } from '@playwright/test';
 
 export class LoginPage extends BasePage {

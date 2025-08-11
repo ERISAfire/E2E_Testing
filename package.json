@@ -3,6 +3,10 @@
   "version": "1.0.0",
   "main": "index.js",
   "type": "module",
+  "exports": {
+    "./playwright.config": "./playwright.config.ts",
+    "./playwright.config.ts": "./playwright.config.ts"
+  },
   "scripts": {
     "allure:clean": "node -e \"const fs=require('fs'); ['allure-results', 'allure-report'].forEach(dir => { if (fs.existsSync(dir)) fs.rmSync(dir, { recursive: true, force: true }); });\"",
     "test": "npm run build && npm run allure:clean && playwright test",
@@ -28,7 +32,8 @@
   "devDependencies": {
     "@faker-js/faker": "^9.5.0",
     "@playwright/test": "^1.50.1",
-    "@types/node": "^22.13.4",
+    "@types/module-alias": "^2.0.4",
+    "@types/node": "^22.17.1",
     "@typescript-eslint/eslint-plugin": "^8.24.1",
     "@typescript-eslint/parser": "^8.24.1",
     "ajv": "^8.17.1",
@@ -37,9 +42,18 @@
     "eslint": "^9.20.1",
     "husky": "^9.1.7",
     "lint-staged": "^15.4.3",
+    "module-alias": "^2.2.3",
     "prettier": "^3.5.1",
-    "typescript": "^5.7.3",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.8.3",
     "typescript-eslint": "^8.24.1"
+  },
+  "_moduleAliases": {
+    "@config": "./src/config",
+    "@core": "./src/core",
+    "@api": "./src/api",
+    "@ui": "./src/ui",
+    "@factories": "./src/factories"
   },
   "dependencies": {
     "dotenv": "^16.4.7",

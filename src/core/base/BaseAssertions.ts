@@ -1,7 +1,10 @@
 import { expect } from '@playwright/test';
 import type { Page, Locator } from '@playwright/test';
-import type { CustomAPIResponse } from '../types/api.types';
-import Ajv from 'ajv';
+import type { CustomAPIResponse } from '../types/api.types.js';
+import AjvModule from 'ajv';
+import type { Ajv as AjvType } from 'ajv';
+
+const Ajv = AjvModule as unknown as { new (): AjvType };
 
 /**
  * Base UI Assertions Class for Playwright
@@ -125,7 +128,7 @@ export class APIAssertions {
    * Ajv instance for JSON schema validation
    * @private
    */
-  private ajv: Ajv;
+  private ajv: AjvType; // Type as any due to Ajv type issues
 
   /**
    * Constructor initializes Ajv for JSON schema validation

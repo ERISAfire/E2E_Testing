@@ -1,8 +1,9 @@
 {
   "compilerOptions": {
     "target": "ES2022",
-    "module": "ESNext",
-    "moduleResolution": "node",
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "moduleDetection": "force",
     "lib": ["ES2022", "dom"],
     "baseUrl": "./src",
     "paths": {
@@ -18,8 +19,17 @@
     "forceConsistentCasingInFileNames": true,
     "resolveJsonModule": true,
     "outDir": "./dist",
-    "rootDir": "./src"
+    "rootDir": ".",
+    "composite": true,
+    "types": ["node", "@playwright/test"],
+    "allowSyntheticDefaultImports": true,
+    "isolatedModules": true
   },
-  "include": ["src/**/*", "eslint.config.js"],
-  "exclude": ["node_modules"]
+  "include": ["src/**/*", "eslint.config.js", "src/types/**/*.d.ts"],
+  "exclude": ["node_modules", "dist", "playwright.config.ts"],
+  "references": [{ "path": "./tsconfig.node.json" }],
+  "ts-node": {
+    "esm": true,
+    "experimentalSpecifierResolution": "node"
+  }
 }

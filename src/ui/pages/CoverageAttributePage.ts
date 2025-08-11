@@ -1,5 +1,5 @@
 import { Page, expect } from '@playwright/test';
-import { BasePage } from '../../core/base/BasePage';
+import { BasePage } from '../../core/base/BasePage.js';
 import {
   getAppSettings,
   getCoverageAttributeCreateButton,
@@ -17,7 +17,7 @@ import {
   getDeleteConfirmButton,
   getDeleteSuccessToast,
   getCancelButton,
-} from '../selectors/coverageAttribute.selectors';
+} from '../selectors/coverageAttribute.selectors.js';
 
 export class CoverageAttributePage extends BasePage {
   constructor(page: Page) {

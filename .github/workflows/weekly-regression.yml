@@ -48,15 +48,14 @@ jobs:
       - name: Run API regression tests
         run: |
           npm run allure:clean
-          npx playwright test --workers=2 --timeout=120000 --grep "@regression.*@api"
+          npx playwright test --workers=2 --grep "@regression.*@api" --reporter=line,allure-playwright
         timeout-minutes: 60
         env:
           NODE_OPTIONS: '--experimental-modules --es-module-specifier-resolution=node'
           PLAYWRIGHT_TEST_TIMEOUT: '120000'
 
       - name: Run UI regression tests
-        run: |
-          npx playwright test --workers=2 --timeout=120000 --grep "@regression.*@ui"
+        run: npx playwright test --workers=2 --grep "@regression.*@ui" --reporter=line,allure-playwright
         timeout-minutes: 60
         env:
           NODE_OPTIONS: '--experimental-modules --es-module-specifier-resolution=node'

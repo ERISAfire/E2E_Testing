@@ -42,27 +42,14 @@ jobs:
           cat > .env << EOF
           BASE_URL=${{ secrets.BASE_URL }}
           API_BASE_URL=${{ secrets.API_BASE_URL }}
-          USER_EMAIL=${{ secrets.USER_EMAIL }}
+          USER_USERNAME=${{ secrets.USER_USERNAME }}
           USER_PASSWORD=${{ secrets.USER_PASSWORD }}
-          API_BEARER_TOKEN=${{ secrets.API_BEARER_TOKEN }}
+          DEFAULT_TIMEOUT=30000
+          API_TIMEOUT=10000
           EOF
 
-      - name: Build project
-        run: npm run build
-
-      - name: Run API tests
-        if: contains(github.event.inputs.testTags, '@api') || !contains(github.event.inputs.testTags, '@ui')
-        run: npx playwright test --workers=2 --grep "${{ github.event.inputs.testTags }}.*@api"
-        env:
-          NODE_OPTIONS: '--experimental-modules --es-module-specifier-resolution=node'
-          PLAYWRIGHT_TEST_TIMEOUT: '120000'
-
-      - name: Run UI tests
-        if: contains(github.event.inputs.testTags, '@ui') || !contains(github.event.inputs.testTags, '@api')
-        run: npx playwright test --workers=2 --grep "${{ github.event.inputs.testTags }}.*@ui"
-        env:
-          NODE_OPTIONS: '--experimental-modules --es-module-specifier-resolution=node'
-          PLAYWRIGHT_TEST_TIMEOUT: '120000'
+      - name: Run tests with selected tags
+        run: npx playwright test --grep "${{ github.event.inputs.testTags }}"
 
       - name: Generate Allure Report
         if: always()

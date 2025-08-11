@@ -80,7 +80,7 @@ export class EnvConfig {
     const config: Config = {
       baseUrl: this.getRequiredEnv('BASE_URL'),
       apiBaseUrl: this.getRequiredEnv('API_BASE_URL'),
-      defaultTimeout: Number(process.env.DEFAULT_TIMEOUT || 120000),
+      defaultTimeout: Number(process.env.DEFAULT_TIMEOUT || 90000),
       credentials: {
         email: this.getRequiredEnv('USER_EMAIL'),
         password: this.getRequiredEnv('USER_PASSWORD'),

@@ -28,7 +28,10 @@ const coverageTypePayload = {
 
 let createdId: string;
 
-test.describe('Coverage Type API', () => {
+test.describe('Coverage Types API', () => {
+  // Generate a unique test run ID to prevent conflicts
+  const testRunId = `api_${process.env.GITHUB_RUN_ID || Date.now()}_${Math.random().toString(36).substring(2, 8)}`;
+
   // NEGATIVE: Missing required fields
   test('POST /coverage-types - should fail with missing required fields @negative @regression @api @coverageType', async ({
     request,
@@ -66,12 +69,26 @@ test.describe('Coverage Type API', () => {
   test('POST /coverage-types - create @smoke @regression @critical @api @coverageType', async ({
     request,
   }) => {
+    const coverageTypeData = {
+      name: `API_${testRunId}_Coverage`,
+      icon: `icon_${testRunId}`,
+      attributes: [
+        {
+          id: '31b0164a-f983-4e41-9ee9-938d1ec3f083',
+          type: 'required',
+        },
+        {
+          id: '1f36557d-e729-4a0e-8888-3dbb114bafdb',
+          type: 'available',
+        },
+      ],
+    };
     const response = await request.post(COVERAGE_TYPES_URL, {
       headers: {
         Authorization: `Bearer ${API_BEARER_TOKEN}`,
         'Content-Type': 'application/json',
       },
-      data: coverageTypePayload,
+      data: coverageTypeData,
     });
     expect(response.status()).toBe(201);
     const body = await response.json();
@@ -137,16 +154,16 @@ test.describe('Coverage Type API', () => {
     test.skip(!createdId, 'No coverage type created');
     const updatePayload = {
       ...coverageTypePayload,
-      name: 'Label Updated',
-      icon: 'wand-magic-sparkles',
+      name: `API_${testRunId}_Updated`,
+      icon: `icon_${testRunId}_updated`,
       attributes: [
         {
           id: '31b0164a-f983-4e41-9ee9-938d1ec3f083',
-          type: 'available',
+          type: 'required',
         },
         {
           id: '1f36557d-e729-4a0e-8888-3dbb114bafdb',
-          type: 'required',
+          type: 'available',
         },
       ],
     };
@@ -335,20 +352,43 @@ test.describe('Coverage Type API', () => {
     expect(body).toHaveProperty('correlationId');
   });
 
-  // DELETE
-  test('DELETE /coverage-types/:id - delete @regression @integration @api @coverageType', async ({
+  // NEGATIVE: DELETE with non-existent id
+
+  // Explicit DELETE test to verify the endpoint works
+  test('DELETE /coverage-types/:id - should delete an existing coverage type @regression @api @coverageType', async ({
     request,
   }) => {
-    test.skip(!createdId, 'No coverage type created');
+    // Skip if no coverage type was created
+    test.skip(!createdId, 'No coverage type ID available for deletion - POST test may have failed');
+
+    // Act: Delete the coverage type
     const response = await request.delete(`${COVERAGE_TYPES_URL}/${createdId}`, {
       headers: {
         Authorization: `Bearer ${API_BEARER_TOKEN}`,
+        'Content-Type': 'application/json',
       },
     });
+
+    // Assert
     expect(response.status()).toBe(200);
   });
 
-  // NEGATIVE: DELETE with non-existent id
+  // Cleanup after all tests
+  test.afterAll(async ({ request }) => {
+    // Cleanup: Delete the created coverage type if it still exists
+    if (createdId) {
+      try {
+        await request.delete(`${COVERAGE_TYPES_URL}/${createdId}`, {
+          headers: {
+            Authorization: `Bearer ${API_BEARER_TOKEN}`,
+          },
+        });
+      } catch (error) {
+        console.error('Error during cleanup:', error);
+      }
+    }
+  });
+
   test('DELETE /coverage-types/:id with non-existent id - should fail with 400 @negative @regression @api @coverageType', async ({
     request,
   }) => {

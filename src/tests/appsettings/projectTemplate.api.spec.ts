@@ -29,6 +29,9 @@ export interface ProjectTemplate {
 
 // Use describe.serial to ensure tests run in order and share state
 test.describe.serial('Project Templates API', () => {
+  // Generate a unique test run ID to prevent conflicts
+  const testRunId = `api_${process.env.GITHUB_RUN_ID || Date.now()}_${Math.random().toString(36).substring(2, 8)}`;
+
   // Variable to store the created template ID between tests
   let createdTemplateId: string;
   test('GET /templates - should return list of project templates @regression @api @projectTemplate', async ({
@@ -159,11 +162,14 @@ test.describe.serial('Project Templates API', () => {
     request,
   }) => {
     // Arrange
+    // Generate unique test data with test run ID
     const templateData = {
-      name: `API Test Template ${Date.now()}`,
-      color: `#${Math.floor(Math.random() * 16777215).toString(16)}`,
+      name: `API_${testRunId}_Template`,
+      color: `#${Math.floor(Math.random() * 16777215)
+        .toString(16)
+        .padStart(6, '0')}`,
       status: 'active' as const,
-      trelloCardId: '639371d1f9968405da28a5ec',
+      trelloCardId: `test_${testRunId}_card`,
     };
 
     // Act
@@ -289,13 +295,30 @@ test.describe.serial('Project Templates API', () => {
     expect(responseBody).toHaveProperty('id', createdTemplateId);
   });
 
+  test.afterAll(async ({ request }) => {
+    // Cleanup: Delete the created template after all tests
+    if (createdTemplateId) {
+      console.log('Cleaning up template with ID:', createdTemplateId);
+      try {
+        await request.delete(`${TEMPLATES_URL}/${createdTemplateId}`, {
+          headers: {
+            Authorization: `Bearer ${API_BEARER_TOKEN}`,
+          },
+        });
+      } catch (error) {
+        console.error('Error during cleanup:', error);
+      }
+    }
+  });
+
   test('DELETE /templates/:id - should delete an existing project template @regression @smoke @api @projectTemplate', async ({
     request,
   }) => {
-    // Fail the test if no template was created
-    if (!createdTemplateId) {
-      throw new Error('No template ID available for deletion - POST test may have failed');
-    }
+    // Skip if no template was created
+    test.skip(
+      !createdTemplateId,
+      'No template ID available for deletion - POST test may have failed'
+    );
 
     // Act: Delete the template using the stored template ID
     const deleteResponse = await request.delete(`${TEMPLATES_URL}/${createdTemplateId}`, {

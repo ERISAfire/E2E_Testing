@@ -204,19 +204,6 @@ test.describe('Coverage Attribute API', () => {
     });
   });
 
-  // DELETE
-  test('DELETE /coverage-attributes/:id - delete @regression @integration @regression @api @coverageAttribute', async ({
-    request,
-  }) => {
-    test.skip(!createdId, 'No coverage attribute created');
-    const response = await request.delete(`${COVERAGE_ATTRIBUTES_URL}/${createdId}`, {
-      headers: {
-        Authorization: `Bearer ${API_BEARER_TOKEN}`,
-      },
-    });
-    expect(response.status()).toBe(200);
-  });
-
   // NEGATIVE: DELETE with non-existent id
   test('DELETE /coverage-attributes/:id with non-existent id - should fail with 400 @negative @regression @api @coverageAttribute', async ({
     request,
@@ -248,5 +235,43 @@ test.describe('Coverage Attribute API', () => {
       error: 'Unauthorized',
       message: expect.any(String),
     });
+  });
+
+  // Explicit DELETE test to verify the endpoint works
+  test('DELETE /coverage-attributes/:id - should delete an existing coverage attribute @regression @api @coverageAttribute', async ({
+    request,
+  }) => {
+    // Skip if no coverage attribute was created
+    test.skip(
+      !createdId,
+      'No coverage attribute ID available for deletion - POST test may have failed'
+    );
+
+    // Act: Delete the coverage attribute
+    const response = await request.delete(`${COVERAGE_ATTRIBUTES_URL}/${createdId}`, {
+      headers: {
+        Authorization: `Bearer ${API_BEARER_TOKEN}`,
+        'Content-Type': 'application/json',
+      },
+    });
+
+    // Assert
+    expect(response.status()).toBe(200);
+  });
+
+  // Cleanup after all tests
+  test.afterAll(async ({ request }) => {
+    // Cleanup: Delete the created coverage attribute if it still exists
+    if (createdId) {
+      try {
+        await request.delete(`${COVERAGE_ATTRIBUTES_URL}/${createdId}`, {
+          headers: {
+            Authorization: `Bearer ${API_BEARER_TOKEN}`,
+          },
+        });
+      } catch (error) {
+        console.error('Error during cleanup:', error);
+      }
+    }
   });
 });

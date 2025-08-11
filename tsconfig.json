@@ -20,6 +20,6 @@
     "outDir": "./dist",
     "rootDir": "./src"
   },
-  "include": ["src/**/*", "eslint.config.js", "allure-helper.ts"],
+  "include": ["src/**/*", "eslint.config.js"],
   "exclude": ["node_modules"]
 }

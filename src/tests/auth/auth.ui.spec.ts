@@ -1,4 +1,4 @@
-import { test } from '../../../base-test';
+import { test } from '../../core/base-test';
 import { expect } from '@playwright/test';
 
 // UI Pages

@@ -1,9 +1,11 @@
 import { Page, expect } from '@playwright/test';
+import { BasePage } from '../../core/base/BasePage';
 import {
   getAddNewButton,
-  getAddNewProjectNoteButton,
-  getAddNoteButton,
   getAppSettings,
+  getAddNewProjectNoteButton,
+  getProjectTemplates,
+  getAddNoteButton,
   getColorInput,
   getDeleteConfirmButton,
   getDeleteDialogText,
@@ -15,7 +17,6 @@ import {
   getProjectNoteTitleInput,
   getProjectTemplateNameInput,
   getProjectTemplateRowActionsButton,
-  getProjectTemplates,
   getSaveButton,
   getStatusDropdown,
   getStatusOption,
@@ -37,8 +38,10 @@ interface ProjectTemplateOptions {
   };
 }
 
-export class ProjectTemplatePage {
-  constructor(private readonly page: Page) {}
+export class ProjectTemplatePage extends BasePage {
+  constructor(page: Page) {
+    super(page);
+  }
 
   async navigateToProjectTemplates(): Promise<void> {
     await getAppSettings(this.page).click();

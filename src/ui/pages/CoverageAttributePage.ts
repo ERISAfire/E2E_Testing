@@ -1,4 +1,5 @@
 import { Page, expect } from '@playwright/test';
+import { BasePage } from '../../core/base/BasePage';
 import {
   getAppSettings,
   getCoverageAttributeCreateButton,
@@ -18,8 +19,10 @@ import {
   getCancelButton,
 } from '../selectors/coverageAttribute.selectors';
 
-export class CoverageAttributePage {
-  constructor(private page: Page) {}
+export class CoverageAttributePage extends BasePage {
+  constructor(page: Page) {
+    super(page);
+  }
 
   async createCoverageAttribute({ name, color }: { name: string; color: string }): Promise<void> {
     await getAppSettings(this.page).click();

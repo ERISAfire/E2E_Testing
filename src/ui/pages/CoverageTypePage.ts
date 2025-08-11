@@ -1,4 +1,5 @@
 import { Page, expect } from '@playwright/test';
+import { BasePage } from '../../core/base/BasePage';
 import {
   getAppSettings,
   getCoverageTypesCreateButton,
@@ -25,8 +26,10 @@ import {
   getCoverageTypeDeletedToast,
 } from '../selectors/coverageType.selectors';
 
-export class CoverageTypePage {
-  constructor(private page: Page) {}
+export class CoverageTypePage extends BasePage {
+  constructor(page: Page) {
+    super(page);
+  }
 
   async createCoverageType({
     name,

@@ -298,7 +298,6 @@ test.describe.serial('Project Templates API', () => {
   test.afterAll(async ({ request }) => {
     // Cleanup: Delete the created template after all tests
     if (createdTemplateId) {
-      console.log('Cleaning up template with ID:', createdTemplateId);
       try {
         await request.delete(`${TEMPLATES_URL}/${createdTemplateId}`, {
           headers: {

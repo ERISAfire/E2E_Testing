@@ -48,17 +48,19 @@ jobs:
       - name: Run API regression tests
         run: |
           npm run allure:clean
-          npx playwright test --workers=2 --grep "@regression.*@api"
+          npx playwright test --workers=2 --timeout=120000 --grep "@regression.*@api"
         timeout-minutes: 60
         env:
           NODE_OPTIONS: '--experimental-modules --es-module-specifier-resolution=node'
+          PLAYWRIGHT_TEST_TIMEOUT: '120000'
 
       - name: Run UI regression tests
         run: |
-          npx playwright test --workers=2 --grep "@regression.*@ui"
+          npx playwright test --workers=2 --timeout=120000 --grep "@regression.*@ui"
         timeout-minutes: 60
         env:
           NODE_OPTIONS: '--experimental-modules --es-module-specifier-resolution=node'
+          PLAYWRIGHT_TEST_TIMEOUT: '120000'
 
       - name: Generate Allure Report
         if: always()

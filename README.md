@@ -2,34 +2,38 @@
 
 ## 🚀 Overview
 
-This comprehensive test automation framework is designed for robust end-to-end testing of web applications, leveraging Playwright, TypeScript, and best practices in test automation. It uses a feature-based test organization approach with support for multiple test types per feature.
+This comprehensive test automation framework is designed for robust end-to-end testing of web applications, leveraging Playwright, TypeScript, and best practices in test automation. The framework supports parallel test execution and includes both UI and API testing capabilities.
 
 ## ✨ Key Features
 
-- **Feature-Based Test Organization**
+- **Test Execution**
 
-  - Tests organized by feature/page instead of test type
-  - Support for UI, API, Integration, and E2E tests per feature
+  - Parallel test execution support
+  - Isolated test data with unique run IDs
+  - Automatic cleanup of test artifacts
   - Comprehensive tag-based filtering
 
-- **Robust Test Architecture**
+- **Test Types**
 
-  - Page Object Pattern for UI
-  - API client architecture
-  - Custom base test with automatic Allure attachments
-  - Comprehensive helper utilities
+  - UI Tests (tagged with `@ui`)
+  - API Tests (tagged with `@api`)
+  - Regression Tests (tagged with `@regression`)
+  - Smoke Tests (tagged with `@smoke`)
+  - Critical Path Tests (tagged with `@critical`)
 
 - **Technology Stack**
-  - Playwright
-  - TypeScript
-  - Allure Reporting
-  - ESLint & Prettier with Pre-commit Hooks
-  - Faker for Test Data Generation
+  - Playwright for browser automation
+  - TypeScript for type safety
+  - Allure for test reporting
+  - GitHub Actions for CI/CD
+  - Faker for test data generation
 
 ## 📋 Prerequisites
 
 - Node.js (v22+ recommended)
 - npm (v10+)
+- Git
+- GitHub account with repository access
 
 ## 🔧 Installation
 
@@ -45,17 +49,118 @@ git clone https://github.com/ERISAfire/E2E_Testing.git
 npm install
 ```
 
-3. Install Playwright browsers
+3. Install Playwright browsers and dependencies
 
 ```bash
-npx playwright install
+npx playwright install --with-deps
 ```
+
+## 🏃‍♂️ Running Tests
+
+### Local Execution
+
+Run all tests:
+
+```bash
+npm test
+```
+
+Run specific test types:
+
+```bash
+# Run only UI tests
+npm run test:ui
+
+# Run only API tests
+npm run test:api
+
+# Run regression tests
+npm run test:regression
+
+# Run smoke tests
+npm run test:smoke
+
+# Run critical path tests
+npm run test:critical
+```
+
+### Test Tags
+
+You can filter tests using tags:
+
+- `@ui` - UI tests
+- `@api` - API tests
+- `@regression` - Regression test suite
+- `@smoke` - Smoke test suite
+- `@critical` - Critical path tests
+
+Example:
+
+```bash
+# Run only API regression tests
+npx playwright test --grep "@api.*@regression"
+```
+
+## 🔄 GitHub Actions
+
+The project includes two main workflows:
+
+1. **Test Automation** (`test-automation.yml`)
+
+   - Manual trigger with tag filtering
+   - Runs on push to main branch
+   - Parallel test execution
+   - Allure report generation
+
+2. **Weekly Regression** (`weekly-regression.yml`)
+   - Scheduled to run every Monday at 01:00 UTC
+   - Can be triggered manually
+   - Runs all regression tests
+   - Generates and publishes Allure report
+
+## 📊 Test Reports
+
+After test execution, you can view the Allure report:
+
+```bash
+# Generate report
+npm run allure:static
+
+# Open report in browser
+npx allure open
+```
+
+## 🛠️ Development
+
+### Project Structure
+
+```
+src/
+  ├── config/         # Configuration files
+  ├── core/           # Core test utilities
+  ├── factories/      # Test data factories
+  ├── pages/          # Page Object Models
+  ├── tests/          # Test files
+  │   ├── api/        # API tests
+  │   └── ui/         # UI tests
+  └── types/          # TypeScript type definitions
+```
+
+### Adding New Tests
+
+1. Create a new test file in the appropriate directory
+2. Add relevant tags (e.g., `@api`, `@ui`, `@regression`)
+3. Use the existing page objects and API clients
+4. Ensure test data is isolated and cleaned up
+   npx playwright install
+
+````
 
 4. Create a `.env` file based on `.env.example`
 
 ```bash
 cp .env.example .env
-```
+````
 
 ## 🧪 Running Tests
 

@@ -38,15 +38,27 @@ jobs:
           USER_EMAIL=${{ secrets.USER_EMAIL }}
           USER_PASSWORD=${{ secrets.USER_PASSWORD }}
           API_BEARER_TOKEN=${{ secrets.API_BEARER_TOKEN }}
-          DEFAULT_TIMEOUT=120000
+          DEFAULT_TIMEOUT=90000
           API_TIMEOUT=10000
           EOF
 
-      - name: Run regression tests
+      - name: Build project
+        run: npm run build
+
+      - name: Run API regression tests
         run: |
           npm run allure:clean
-          npx playwright test --workers=1 --grep @regression
-        timeout-minutes: 120
+          npx playwright test --workers=2 --grep "@regression.*@api"
+        timeout-minutes: 60
+        env:
+          NODE_OPTIONS: '--experimental-modules --es-module-specifier-resolution=node'
+
+      - name: Run UI regression tests
+        run: |
+          npx playwright test --workers=2 --grep "@regression.*@ui"
+        timeout-minutes: 60
+        env:
+          NODE_OPTIONS: '--experimental-modules --es-module-specifier-resolution=node'
 
       - name: Generate Allure Report
         if: always()

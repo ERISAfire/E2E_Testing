@@ -1,7 +1,8 @@
 {
   "compilerOptions": {
     "target": "ES2022",
-    "module": "commonjs",
+    "module": "ESNext",
+    "moduleResolution": "node",
     "lib": ["ES2022", "dom"],
     "baseUrl": "./src",
     "paths": {
@@ -15,7 +16,9 @@
     "strict": true,
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
-    "resolveJsonModule": true
+    "resolveJsonModule": true,
+    "outDir": "./dist",
+    "rootDir": "./src"
   },
   "include": ["src/**/*", "eslint.config.js", "allure-helper.ts"],
   "exclude": ["node_modules"]

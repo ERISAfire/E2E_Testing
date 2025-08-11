@@ -1,5 +1,5 @@
 import dotenv from 'dotenv';
-import { Config } from '../core/types/config.types';
+import type { Config } from '@core/types/config.types';
 
 /**
  * Environment Configuration Management Class

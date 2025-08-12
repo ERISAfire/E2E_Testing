@@ -11,11 +11,14 @@ test.describe('Coverage Attribute UI E2E', () => {
     await loginPage.login(process.env.USER_EMAIL as string, process.env.USER_PASSWORD as string);
     const coverageAttributePage = new CoverageAttributePage(page);
 
-    await coverageAttributePage.createCoverageAttribute({ name: 'Automation_test', color: '2345' });
+    await coverageAttributePage.createCoverageAttribute({
+      name: 'Automation_test',
+      color: '#2345',
+    });
 
     await coverageAttributePage.editCoverageAttribute(
       'Automation_test_test', // newName
-      '8943' // newColor
+      '#8943' // newColor
     );
 
     await coverageAttributePage.deleteCoverageAttribute();

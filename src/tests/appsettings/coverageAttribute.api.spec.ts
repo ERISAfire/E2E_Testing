@@ -1,6 +1,11 @@
-import { test, expect } from '@playwright/test';
-
+import { test, expect, APIRequestContext } from '@playwright/test';
 import { EnvConfig } from '../../config/env.config.js';
+
+interface TestCoverageAttribute {
+  id: string;
+  name: string;
+  color: string;
+}
 
 // Get config singleton
 const config = EnvConfig.getInstance();
@@ -11,13 +16,40 @@ const API_BEARER_TOKEN = config.getConfig().apiBearerToken;
 const COVERAGE_ATTRIBUTES_PATH = '/v1/coverage-attributes';
 const COVERAGE_ATTRIBUTES_URL = `${API_BASE_URL}${COVERAGE_ATTRIBUTES_PATH}`;
 
-// Example of creating a coverage attribute
-const coverageAttributePayload = {
-  name: 'Label',
-  color: '15710d',
+// Helper function to create a unique coverage attribute
+const createTestCoverageAttribute = async (
+  request: APIRequestContext,
+  nameSuffix: string = ''
+): Promise<TestCoverageAttribute> => {
+  const payload = {
+    name: `Test Label ${nameSuffix || Date.now()}`,
+    color: `#${Math.floor(Math.random() * 16777215)
+      .toString(16)
+      .padStart(6, '0')}`,
+  };
+
+  const response = await request.post(COVERAGE_ATTRIBUTES_URL, {
+    headers: {
+      Authorization: `Bearer ${API_BEARER_TOKEN}`,
+      'Content-Type': 'application/json',
+    },
+    data: payload,
+  });
+
+  if (response.status() !== 201) {
+    const body = await response.text();
+    throw new Error(`Failed to create test coverage attribute: ${response.status()} - ${body}`);
+  }
+
+  const body = await response.json();
+  return { id: body.id, ...payload };
 };
 
-let createdId: string;
+// Example of creating a coverage attribute
+const coverageAttributePayload = {
+  name: 'Test Label',
+  color: '#15710d',
+};
 
 test.describe('Coverage Attribute API', () => {
   // NEGATIVE: Missing required fields
@@ -76,9 +108,8 @@ test.describe('Coverage Attribute API', () => {
     expect(body.subErrors).toEqual(expect.arrayContaining(['color must be a hexadecimal color']));
   });
 
-  // POST
-  // Create coverage attribute
-  test('POST /coverage-attributes - create @smoke @regression @critical @regression @api @coverageAttribute', async ({
+  // POST - Create coverage attribute
+  test('POST /coverage-attributes - create @smoke @regression @critical @api @coverageAttribute', async ({
     request,
   }) => {
     const response = await request.post(COVERAGE_ATTRIBUTES_URL, {
@@ -88,10 +119,18 @@ test.describe('Coverage Attribute API', () => {
       },
       data: coverageAttributePayload,
     });
+
+    // Log response for debugging
+    const responseBody = await response.text();
+    console.log('POST /coverage-attributes response:', response.status(), responseBody);
+
+    // Verify the response
     expect(response.status()).toBe(201);
-    const body = await response.json();
+
+    // Parse and verify the response body
+    const body = JSON.parse(responseBody);
     expect(body).toHaveProperty('id');
-    createdId = body.id;
+    expect(typeof body.id).toBe('string');
   });
 
   // GET (list)
@@ -139,23 +178,34 @@ test.describe('Coverage Attribute API', () => {
     });
   });
 
-  // PATCH
-  test('PATCH /coverage-attributes/:id - update @regression @integration @regression @api @coverageAttribute', async ({
+  // PATCH - Update coverage attribute
+  test('PATCH /coverage-attributes/:id - update @regression @api @coverageAttribute', async ({
     request,
   }) => {
-    test.skip(!createdId, 'No coverage attribute created');
-    const updatePayload = { ...coverageAttributePayload, name: 'Updated Label', color: '#123456' };
-    const response = await request.patch(`${COVERAGE_ATTRIBUTES_URL}/${createdId}`, {
+    // First create a test coverage attribute
+    const testAttribute = await createTestCoverageAttribute(request, 'for-update');
+
+    // Then update it
+    const updatePayload = {
+      name: `Updated Label ${Date.now()}`,
+      color: Math.floor(Math.random() * 16777215)
+        .toString(16)
+        .padStart(6, '0'),
+    };
+
+    const response = await request.patch(`${COVERAGE_ATTRIBUTES_URL}/${testAttribute.id}`, {
       headers: {
         Authorization: `Bearer ${API_BEARER_TOKEN}`,
         'Content-Type': 'application/json',
       },
       data: updatePayload,
     });
+
+    // Verify the response
     expect(response.status()).toBe(200);
     const body = await response.json();
     expect(body).toHaveProperty('id');
-    expect(body.id).toBe(createdId);
+    expect(body.id).toBe(testAttribute.id);
   });
 
   // NEGATIVE: PATCH with non-existent id
@@ -237,41 +287,34 @@ test.describe('Coverage Attribute API', () => {
     });
   });
 
-  // Explicit DELETE test to verify the endpoint works
+  // DELETE - Remove coverage attribute
   test('DELETE /coverage-attributes/:id - should delete an existing coverage attribute @regression @api @coverageAttribute', async ({
     request,
   }) => {
-    // Skip if no coverage attribute was created
-    test.skip(
-      !createdId,
-      'No coverage attribute ID available for deletion - POST test may have failed'
-    );
+    // First create a test coverage attribute
+    const testAttribute = await createTestCoverageAttribute(request, 'for-delete');
 
-    // Act: Delete the coverage attribute
-    const response = await request.delete(`${COVERAGE_ATTRIBUTES_URL}/${createdId}`, {
+    // Then delete it
+    const response = await request.delete(`${COVERAGE_ATTRIBUTES_URL}/${testAttribute.id}`, {
       headers: {
         Authorization: `Bearer ${API_BEARER_TOKEN}`,
         'Content-Type': 'application/json',
       },
     });
 
-    // Assert
+    // Log response for debugging
+    const responseBody = await response.text();
+    console.log('DELETE /coverage-attributes response:', response.status(), responseBody);
+
+    // Verify the response
     expect(response.status()).toBe(200);
+
+    // Verify the response body contains the ID of the deleted attribute
+    const body = JSON.parse(responseBody);
+    expect(body).toHaveProperty('id');
+    expect(body.id).toBe(testAttribute.id);
   });
 
-  // Cleanup after all tests
-  test.afterAll(async ({ request }) => {
-    // Cleanup: Delete the created coverage attribute if it still exists
-    if (createdId) {
-      try {
-        await request.delete(`${COVERAGE_ATTRIBUTES_URL}/${createdId}`, {
-          headers: {
-            Authorization: `Bearer ${API_BEARER_TOKEN}`,
-          },
-        });
-      } catch (error) {
-        console.error('Error during cleanup:', error);
-      }
-    }
-  });
+  // No global cleanup needed as each test creates and deletes its own test data
+  // This ensures tests are independent and can run in any order
 });

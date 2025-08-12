@@ -25,6 +25,12 @@ jobs:
         with:
           ref: ${{ github.event.inputs.branch }}
 
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
       - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
@@ -55,7 +61,7 @@ jobs:
       - name: Run API tests
         if: contains(github.event.inputs.testTags, '@api') || !contains(github.event.inputs.testTags, '@ui')
         run: |
-          NODE_OPTIONS='--loader ts-node/esm' npx playwright test --workers=2 --grep "${{ github.event.inputs.testTags }}.*@api" --reporter=list,html
+          NODE_OPTIONS='--loader ts-node/esm' npx playwright test --workers=2 --grep "${{ github.event.inputs.testTags }}.*@api" --reporter=list,allure-playwright
         env:
           NODE_OPTIONS: '--experimental-modules --es-module-specifier-resolution=node --loader ts-node/esm'
           PLAYWRIGHT_TEST_TIMEOUT: '120000'
@@ -64,7 +70,7 @@ jobs:
       - name: Run UI tests
         if: contains(github.event.inputs.testTags, '@ui') || !contains(github.event.inputs.testTags, '@api')
         run: |
-          NODE_OPTIONS='--loader ts-node/esm' npx playwright test --workers=2 --grep "${{ github.event.inputs.testTags }}.*@ui" --reporter=list,html
+          NODE_OPTIONS='--loader ts-node/esm' npx playwright test --workers=2 --grep "${{ github.event.inputs.testTags }}.*@ui" --reporter=list,allure-playwright
         env:
           NODE_OPTIONS: '--experimental-modules --es-module-specifier-resolution=node --loader ts-node/esm'
           PLAYWRIGHT_TEST_TIMEOUT: '120000'
@@ -72,12 +78,22 @@ jobs:
 
       - name: Generate Allure Report
         if: always()
-        run: npm run allure:static
+        run: |
+          npm install -g allure-commandline
+          allure generate allure-results --clean -o allure-report
 
-      - name: Publish Test Results
+      - name: Upload Allure Report
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: test-results
+          name: allure-report
           path: allure-report/
+          retention-days: 30
+
+      - name: Upload Allure Results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: allure-results
+          path: allure-results/
           retention-days: 30

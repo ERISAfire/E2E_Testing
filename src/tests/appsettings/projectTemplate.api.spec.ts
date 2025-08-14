@@ -223,7 +223,7 @@ test.describe.serial('Project Templates API', () => {
     expect(testProjectTemplate).toMatchObject({
       name: `API_${testRunId}_Template`,
       status: 'active',
-      trelloCardId: `test_${testRunId}_card`,
+      trelloCardId: '639371d1f9968405da28a5ec',
     });
 
     // Verify required fields

@@ -59,19 +59,45 @@ jobs:
           npm run build
 
       - name: Run API tests
-        if: contains(github.event.inputs.testTags, '@api')
+        if: contains(github.event.inputs.testTags, '@api') || github.event.inputs.testTags == '@regression' || github.event.inputs.testTags == '@smoke' || github.event.inputs.testTags == '@coverageType' || github.event.inputs.testTags == '@auth' || github.event.inputs.testTags == '@coverageAttribute' || github.event.inputs.testTags == '@projectTemplate'
         run: |
-          NODE_OPTIONS='--loader ts-node/esm' npx playwright test --workers=2 --grep "@api" --reporter=list,allure-playwright
+          if [[ "${{ github.event.inputs.testTags }}" == "@api" ]]; then
+            NODE_OPTIONS='--loader ts-node/esm' npx playwright test --workers=2 --grep "@api" --reporter=list,allure-playwright
+          elif [[ "${{ github.event.inputs.testTags }}" == "@regression" ]]; then
+            NODE_OPTIONS='--loader ts-node/esm' npx playwright test --workers=2 --grep "@regression.*@api" --reporter=list,allure-playwright
+          elif [[ "${{ github.event.inputs.testTags }}" == "@smoke" ]]; then
+            NODE_OPTIONS='--loader ts-node/esm' npx playwright test --workers=2 --grep "@smoke.*@api" --reporter=list,allure-playwright
+          elif [[ "${{ github.event.inputs.testTags }}" == "@coverageType" ]]; then
+            NODE_OPTIONS='--loader ts-node/esm' npx playwright test --workers=2 --grep "@coverageType.*@api" --reporter=list,allure-playwright
+          elif [[ "${{ github.event.inputs.testTags }}" == "@auth" ]]; then
+            NODE_OPTIONS='--loader ts-node/esm' npx playwright test --workers=2 --grep "@auth.*@api" --reporter=list,allure-playwright
+          elif [[ "${{ github.event.inputs.testTags }}" == "@coverageAttribute" ]]; then
+            NODE_OPTIONS='--loader ts-node/esm' npx playwright test --workers=2 --grep "@coverageAttribute.*@api" --reporter=list,allure-playwright
+          elif [[ "${{ github.event.inputs.testTags }}" == "@projectTemplate" ]]; then
+            NODE_OPTIONS='--loader ts-node/esm' npx playwright test --workers=2 --grep "@projectTemplate.*@api" --reporter=list,allure-playwright
+          fi
         env:
           NODE_OPTIONS: '--experimental-modules --es-module-specifier-resolution=node --loader ts-node/esm'
           PLAYWRIGHT_TEST_TIMEOUT: '120000'
           TS_NODE_PROJECT: './tsconfig.json'
 
       - name: Run UI tests
-        if: contains(github.event.inputs.testTags, '@ui') || (!contains(github.event.inputs.testTags, '@api') && !contains(github.event.inputs.testTags, '@ui'))
+        if: contains(github.event.inputs.testTags, '@ui') || github.event.inputs.testTags == '@regression' || github.event.inputs.testTags == '@smoke' || github.event.inputs.testTags == '@coverageType' || github.event.inputs.testTags == '@auth' || github.event.inputs.testTags == '@coverageAttribute' || github.event.inputs.testTags == '@projectTemplate' || (!contains(github.event.inputs.testTags, '@api') && !contains(github.event.inputs.testTags, '@ui'))
         run: |
           if [[ "${{ github.event.inputs.testTags }}" == "@ui" ]]; then
             NODE_OPTIONS='--loader ts-node/esm' npx playwright test --workers=2 --grep "@ui" --reporter=list,allure-playwright
+          elif [[ "${{ github.event.inputs.testTags }}" == "@regression" ]]; then
+            NODE_OPTIONS='--loader ts-node/esm' npx playwright test --workers=2 --grep "@regression.*@ui" --reporter=list,allure-playwright
+          elif [[ "${{ github.event.inputs.testTags }}" == "@smoke" ]]; then
+            NODE_OPTIONS='--loader ts-node/esm' npx playwright test --workers=2 --grep "@smoke.*@ui" --reporter=list,allure-playwright
+          elif [[ "${{ github.event.inputs.testTags }}" == "@coverageType" ]]; then
+            NODE_OPTIONS='--loader ts-node/esm' npx playwright test --workers=2 --grep "@coverageType.*@ui" --reporter=list,allure-playwright
+          elif [[ "${{ github.event.inputs.testTags }}" == "@auth" ]]; then
+            NODE_OPTIONS='--loader ts-node/esm' npx playwright test --workers=2 --grep "@auth.*@ui" --reporter=list,allure-playwright
+          elif [[ "${{ github.event.inputs.testTags }}" == "@coverageAttribute" ]]; then
+            NODE_OPTIONS='--loader ts-node/esm' npx playwright test --workers=2 --grep "@coverageAttribute.*@ui" --reporter=list,allure-playwright
+          elif [[ "${{ github.event.inputs.testTags }}" == "@projectTemplate" ]]; then
+            NODE_OPTIONS='--loader ts-node/esm' npx playwright test --workers=2 --grep "@projectTemplate.*@ui" --reporter=list,allure-playwright
           else
             NODE_OPTIONS='--loader ts-node/esm' npx playwright test --workers=2 --grep "${{ github.event.inputs.testTags }}" --reporter=list,allure-playwright
           fi

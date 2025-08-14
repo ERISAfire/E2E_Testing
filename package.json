@@ -15,7 +15,6 @@
     "test:api": "npm run build && npm run allure:clean && playwright test --grep @api && allure generate allure-results --clean -o allure-report && allure open allure-report",
     "test:smoke:api": "npm run build && npm run allure:clean && playwright test --grep @smoke.*@api && allure generate allure-results --clean -o allure-report && allure open allure-report",
     "test:ui": "npm run build && npm run allure:clean && playwright test --grep @ui && allure generate allure-results --clean -o allure-report && allure open allure-report",
-    "test:critical": "npm run build && npm run allure:clean && playwright test --grep @critical && allure generate allure-results --clean -o allure-report && allure open allure-report",
     "test:negative": "npm run build && npm run allure:clean && playwright test --grep @negative && allure generate allure-results --clean -o allure-report && allure open allure-report",
     "lint": "eslint src",
     "format": "prettier --write \"src/**/*.ts\"",

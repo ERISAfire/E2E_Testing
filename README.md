@@ -336,19 +336,35 @@ The workflow intelligently handles different tag combinations:
 
 **How it works:**
 
-- If tag contains `@api` → runs API tests only
-- If tag contains `@ui` OR is a functional tag (like `@auth`, `@smoke`) → runs UI tests
-- Uses simple substring matching for maximum compatibility
-- Functional tags (without `@api`/`@ui`) default to UI tests since most functional tests are UI-based
+The workflow runs tests in two parallel sections:
+
+**API Tests Section** runs when tag is:
+
+- `@api` → All API tests
+- `@regression` → Regression API tests only
+- `@smoke` → Smoke API tests only
+- `@auth` → Auth API tests only
+- `@coverageAttribute` → Coverage attribute API tests only
+- `@coverageType` → Coverage type API tests only
+- `@projectTemplate` → Project template API tests only
+
+**UI Tests Section** runs when tag is:
+
+- `@ui` → All UI tests
+- `@regression` → Regression UI tests only
+- `@smoke` → Smoke UI tests only
+- `@auth` → Auth UI tests only
+- `@coverageAttribute` → Coverage attribute UI tests only
+- `@coverageType` → Coverage type UI tests only
+- `@projectTemplate` → Project template UI tests only
 
 **Examples:**
 
-- `@api` → All API tests only
-- `@ui` → All UI tests only
-- `@auth` → All auth tests (UI-based: 3 tests)
-- `@smoke` → All smoke tests (mostly UI-based)
-- `@coverageAttribute` → All coverage attribute tests (UI-based)
-- Mixed tags like `@smoke @api` → API tests only
+- `@api` → API section only (all API tests)
+- `@ui` → UI section only (all UI tests)
+- `@auth` → Both sections (auth API tests + auth UI tests)
+- `@regression` → Both sections (regression API tests + regression UI tests)
+- `@coverageType` → Both sections (coverageType API tests + coverageType UI tests)
 
 ### Automated Weekly Regression
 

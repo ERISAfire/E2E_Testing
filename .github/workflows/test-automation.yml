@@ -59,25 +59,21 @@ jobs:
           npm run build
 
       - name: Run API tests
-        if: contains(github.event.inputs.testTags, '@api') || !contains(github.event.inputs.testTags, '@ui')
+        if: contains(github.event.inputs.testTags, '@api')
         run: |
-          if [[ "${{ github.event.inputs.testTags }}" == "@api" ]]; then
-            NODE_OPTIONS='--loader ts-node/esm' npx playwright test --workers=2 --grep "@api" --reporter=list,allure-playwright
-          else
-            NODE_OPTIONS='--loader ts-node/esm' npx playwright test --workers=2 --grep "(?=.*${{ github.event.inputs.testTags }})(?=.*@api)" --reporter=list,allure-playwright
-          fi
+          NODE_OPTIONS='--loader ts-node/esm' npx playwright test --workers=2 --grep "@api" --reporter=list,allure-playwright
         env:
           NODE_OPTIONS: '--experimental-modules --es-module-specifier-resolution=node --loader ts-node/esm'
           PLAYWRIGHT_TEST_TIMEOUT: '120000'
           TS_NODE_PROJECT: './tsconfig.json'
 
       - name: Run UI tests
-        if: contains(github.event.inputs.testTags, '@ui') || !contains(github.event.inputs.testTags, '@api')
+        if: contains(github.event.inputs.testTags, '@ui') || (!contains(github.event.inputs.testTags, '@api') && !contains(github.event.inputs.testTags, '@ui'))
         run: |
           if [[ "${{ github.event.inputs.testTags }}" == "@ui" ]]; then
             NODE_OPTIONS='--loader ts-node/esm' npx playwright test --workers=2 --grep "@ui" --reporter=list,allure-playwright
           else
-            NODE_OPTIONS='--loader ts-node/esm' npx playwright test --workers=2 --grep "(?=.*${{ github.event.inputs.testTags }})(?=.*@ui)" --reporter=list,allure-playwright
+            NODE_OPTIONS='--loader ts-node/esm' npx playwright test --workers=2 --grep "${{ github.event.inputs.testTags }}" --reporter=list,allure-playwright
           fi
         env:
           NODE_OPTIONS: '--experimental-modules --es-module-specifier-resolution=node --loader ts-node/esm'

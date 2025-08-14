@@ -284,21 +284,17 @@ jobs:
           npm run build
 
       - name: Run API tests
-        if: contains(github.event.inputs.testTags, '@api') || !contains(github.event.inputs.testTags, '@ui')
+        if: contains(github.event.inputs.testTags, '@api')
         run: |
-          if [[ "${{ github.event.inputs.testTags }}" == "@api" ]]; then
-            NODE_OPTIONS='--loader ts-node/esm' npx playwright test --workers=2 --grep "@api" --reporter=list,allure-playwright
-          else
-            NODE_OPTIONS='--loader ts-node/esm' npx playwright test --workers=2 --grep "(?=.*${{ github.event.inputs.testTags }})(?=.*@api)" --reporter=list,allure-playwright
-          fi
+          NODE_OPTIONS='--loader ts-node/esm' npx playwright test --workers=2 --grep "@api" --reporter=list,allure-playwright
 
       - name: Run UI tests
-        if: contains(github.event.inputs.testTags, '@ui') || !contains(github.event.inputs.testTags, '@api')
+        if: contains(github.event.inputs.testTags, '@ui') || (!contains(github.event.inputs.testTags, '@api') && !contains(github.event.inputs.testTags, '@ui'))
         run: |
           if [[ "${{ github.event.inputs.testTags }}" == "@ui" ]]; then
             NODE_OPTIONS='--loader ts-node/esm' npx playwright test --workers=2 --grep "@ui" --reporter=list,allure-playwright
           else
-            NODE_OPTIONS='--loader ts-node/esm' npx playwright test --workers=2 --grep "(?=.*${{ github.event.inputs.testTags }})(?=.*@ui)" --reporter=list,allure-playwright
+            NODE_OPTIONS='--loader ts-node/esm' npx playwright test --workers=2 --grep "${{ github.event.inputs.testTags }}" --reporter=list,allure-playwright
           fi
 
       - name: Generate Allure Static Report
@@ -340,18 +336,19 @@ The workflow intelligently handles different tag combinations:
 
 **How it works:**
 
-- If tag contains `@api` OR doesn't contain `@ui` → runs API tests
-- If tag contains `@ui` OR doesn't contain `@api` → runs UI tests
-- Uses positive lookahead regex patterns `(?=.*tag)(?=.*@api)` to find tests with both tags regardless of order
-- Special handling for pure `@api` and `@ui` tags to avoid pattern conflicts
+- If tag contains `@api` → runs API tests only
+- If tag contains `@ui` OR is a functional tag (like `@auth`, `@smoke`) → runs UI tests
+- Uses simple substring matching for maximum compatibility
+- Functional tags (without `@api`/`@ui`) default to UI tests since most functional tests are UI-based
 
 **Examples:**
 
-- `@smoke` → API smoke tests + UI smoke tests
 - `@api` → All API tests only
-- `@auth` → All auth UI tests (finds `@regression @ui @auth`)
-- `@coverageAttribute` → All coverage attribute tests (API + UI)
-- Tags work in any order: `@ui @auth` = `@auth @ui`
+- `@ui` → All UI tests only
+- `@auth` → All auth tests (UI-based: 3 tests)
+- `@smoke` → All smoke tests (mostly UI-based)
+- `@coverageAttribute` → All coverage attribute tests (UI-based)
+- Mixed tags like `@smoke @api` → API tests only
 
 ### Automated Weekly Regression
 

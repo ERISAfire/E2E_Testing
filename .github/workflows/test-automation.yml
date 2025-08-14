@@ -64,7 +64,7 @@ jobs:
           if [[ "${{ github.event.inputs.testTags }}" == "@api" ]]; then
             NODE_OPTIONS='--loader ts-node/esm' npx playwright test --workers=2 --grep "@api" --reporter=list,allure-playwright
           else
-            NODE_OPTIONS='--loader ts-node/esm' npx playwright test --workers=2 --grep "${{ github.event.inputs.testTags }}.*@api" --reporter=list,allure-playwright
+            NODE_OPTIONS='--loader ts-node/esm' npx playwright test --workers=2 --grep "(?=.*${{ github.event.inputs.testTags }})(?=.*@api)" --reporter=list,allure-playwright
           fi
         env:
           NODE_OPTIONS: '--experimental-modules --es-module-specifier-resolution=node --loader ts-node/esm'
@@ -77,7 +77,7 @@ jobs:
           if [[ "${{ github.event.inputs.testTags }}" == "@ui" ]]; then
             NODE_OPTIONS='--loader ts-node/esm' npx playwright test --workers=2 --grep "@ui" --reporter=list,allure-playwright
           else
-            NODE_OPTIONS='--loader ts-node/esm' npx playwright test --workers=2 --grep "${{ github.event.inputs.testTags }}.*@ui" --reporter=list,allure-playwright
+            NODE_OPTIONS='--loader ts-node/esm' npx playwright test --workers=2 --grep "(?=.*${{ github.event.inputs.testTags }})(?=.*@ui)" --reporter=list,allure-playwright
           fi
         env:
           NODE_OPTIONS: '--experimental-modules --es-module-specifier-resolution=node --loader ts-node/esm'

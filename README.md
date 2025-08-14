@@ -275,25 +275,83 @@ jobs:
           API_BASE_URL=${{ secrets.API_BASE_URL }}
           USER_EMAIL=${{ secrets.USER_EMAIL }}
           USER_PASSWORD=${{ secrets.USER_PASSWORD }}
-          DEFAULT_TIMEOUT=30000
-          API_TIMEOUT=10000
+          API_BEARER_TOKEN=${{ secrets.API_BEARER_TOKEN }}
           EOF
 
-      - name: Run tests with selected tags
-        run: npx playwright test --grep "${{ github.event.inputs.testTags }}"
+      - name: Build project
+        run: |
+          npm install
+          npm run build
 
-      - name: Generate Allure Report
+      - name: Run API tests
+        if: contains(github.event.inputs.testTags, '@api') || !contains(github.event.inputs.testTags, '@ui')
+        run: |
+          if [[ "${{ github.event.inputs.testTags }}" == "@api" ]]; then
+            NODE_OPTIONS='--loader ts-node/esm' npx playwright test --workers=2 --grep "@api" --reporter=list,allure-playwright
+          else
+            NODE_OPTIONS='--loader ts-node/esm' npx playwright test --workers=2 --grep "(?=.*${{ github.event.inputs.testTags }})(?=.*@api)" --reporter=list,allure-playwright
+          fi
+
+      - name: Run UI tests
+        if: contains(github.event.inputs.testTags, '@ui') || !contains(github.event.inputs.testTags, '@api')
+        run: |
+          if [[ "${{ github.event.inputs.testTags }}" == "@ui" ]]; then
+            NODE_OPTIONS='--loader ts-node/esm' npx playwright test --workers=2 --grep "@ui" --reporter=list,allure-playwright
+          else
+            NODE_OPTIONS='--loader ts-node/esm' npx playwright test --workers=2 --grep "(?=.*${{ github.event.inputs.testTags }})(?=.*@ui)" --reporter=list,allure-playwright
+          fi
+
+      - name: Generate Allure Static Report
         if: always()
-        run: npm run allure:static
+        run: |
+          npm install -g allure-commandline
+          mkdir -p allure-report/static
+          allure generate allure-results --clean -o allure-report/static --single-file
+          mkdir -p allure-static-report
+          cp allure-report/static/index.html allure-static-report/
 
-      - name: Publish Test Results
+      - name: Upload Allure Static Report
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: test-results
-          path: allure-report/
+          path: allure-static-report/
           retention-days: 30
 ```
+
+### Tag Usage in GitHub Actions
+
+The workflow intelligently handles different tag combinations:
+
+**Single Tags:**
+
+- `@api` - Runs all API tests
+- `@ui` - Runs all UI tests
+- `@smoke` - Runs smoke tests for both API and UI
+- `@regression` - Runs regression tests for both API and UI
+- `@negative` - Runs negative tests for both API and UI
+
+**Functional Tags:**
+
+- `@auth` - Authentication tests (API + UI)
+- `@coverageAttribute` - Coverage attribute tests (API + UI)
+- `@coverageType` - Coverage type tests (API + UI)
+- `@projectTemplate` - Project template tests (API + UI)
+
+**How it works:**
+
+- If tag contains `@api` OR doesn't contain `@ui` → runs API tests
+- If tag contains `@ui` OR doesn't contain `@api` → runs UI tests
+- Uses positive lookahead regex patterns `(?=.*tag)(?=.*@api)` to find tests with both tags regardless of order
+- Special handling for pure `@api` and `@ui` tags to avoid pattern conflicts
+
+**Examples:**
+
+- `@smoke` → API smoke tests + UI smoke tests
+- `@api` → All API tests only
+- `@auth` → All auth UI tests (finds `@regression @ui @auth`)
+- `@coverageAttribute` → All coverage attribute tests (API + UI)
+- Tags work in any order: `@ui @auth` = `@auth @ui`
 
 ### Automated Weekly Regression
 

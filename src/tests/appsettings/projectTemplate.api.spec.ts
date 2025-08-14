@@ -38,7 +38,7 @@ const createTestProjectTemplate = async (
       .toString(16)
       .padStart(6, '0')}`,
     status: 'active' as const,
-    trelloCardId: `test_${testRunId}_card`,
+    trelloCardId: '639371d1f9968405da28a5ec',
   };
 
   const response = await request.post(TEMPLATES_URL, {
@@ -302,8 +302,10 @@ test.describe.serial('Project Templates API', () => {
     // Prepare update data
     const updateData = {
       name: `Updated Template ${Date.now()}`,
-      color: `#${Math.floor(Math.random() * 16777215).toString(16)}`,
-      status: 'draft' as const,
+      color: `#${Math.floor(Math.random() * 16777215)
+        .toString(16)
+        .padStart(6, '0')}`,
+      status: 'active' as const,
       trelloCardId: '639371d1f9968405da28a5ec',
     };
 
@@ -318,6 +320,13 @@ test.describe.serial('Project Templates API', () => {
     });
 
     // Assert
+    if (updateResponse.status() !== 200) {
+      const errorBody = await updateResponse.json();
+      console.error('PATCH failed with status:', updateResponse.status());
+      console.error('Error response:', JSON.stringify(errorBody, null, 2));
+      console.error('Request data:', JSON.stringify(updateData, null, 2));
+      console.error('Template ID:', testProjectTemplate.id);
+    }
     expect(updateResponse.status()).toBe(200);
     const responseBody = await updateResponse.json();
 

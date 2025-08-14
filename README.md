@@ -19,7 +19,6 @@ This comprehensive test automation framework is designed for robust end-to-end t
   - API Tests (tagged with `@api`)
   - Regression Tests (tagged with `@regression`)
   - Smoke Tests (tagged with `@smoke`)
-  - Critical Path Tests (tagged with `@critical`)
 
 - **Technology Stack**
   - Playwright for browser automation
@@ -92,7 +91,6 @@ You can filter tests using tags:
 - `@api` - API tests
 - `@regression` - Regression test suite
 - `@smoke` - Smoke test suite
-- `@critical` - Critical path tests
 
 Example:
 
@@ -198,7 +196,7 @@ Tests can be filtered using tags within test names:
 
 ```typescript
 // Test with multiple tags
-test('successful login @smoke @regression @critical @ui @auth', async () => {
+test('successful login @smoke @regression @ui @auth', async () => {
   // Test code
 });
 ```
@@ -237,7 +235,7 @@ on:
   workflow_dispatch:
     inputs:
       testTags:
-        description: 'Tags to run (e.g. @smoke, @regression, @api, @ui, @critical, @auth)'
+        description: 'Tags to run (e.g. @smoke, @regression, @api, @ui, @auth)'
         required: true
         default: '@smoke'
         type: string
@@ -817,7 +815,6 @@ Use tags to categorize tests:
 
   - `@smoke` - Critical path tests (subset of regression)
   - `@regression` - Full regression suite
-  - `@critical` - Business-critical tests
   - `@negative` - Negative tests
 
 - **Feature Areas**

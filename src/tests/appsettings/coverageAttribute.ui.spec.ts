@@ -3,7 +3,7 @@ import 'dotenv/config';
 import { CoverageAttributePage } from '../../ui/pages/CoverageAttributePage.js';
 
 test.describe('Coverage Attribute UI E2E', () => {
-  test('should create, edit and delete coverage attribute via UI @smoke @regression @critical @ui @coverageAttribute @e2e', async ({
+  test('should create, edit and delete coverage attribute via UI @smoke @regression @ui @coverageAttribute @e2e', async ({
     page,
   }) => {
     const loginPage = new (await import('../../ui/pages/LoginPage.js')).LoginPage(page);

@@ -38,9 +38,9 @@ test.describe('Auth UI Tests', () => {
   test.describe('Login Tests', () => {
     /**
      * Test successful login using environment credentials
-     * @tags smoke, regression, critical, ui, auth
+     * @tags smoke, regression, ui, auth
      */
-    test('should successfully login with valid credentials @smoke @regression @critical @ui @auth', async () => {
+    test('should successfully login with valid credentials @smoke @regression @ui @auth', async () => {
       // Using credentials from environment configuration
       await loginPage.login(
         env.get<string>('credentials.email'),

@@ -17,8 +17,8 @@ import { TestInfo } from '@playwright/test';
  * @returns Array of tags found in the test title
  *
  * @example
- * // For a test named "login test @smoke @critical"
- * // This would return ["@smoke", "@critical"]
+ * // For a test named "login test @smoke"
+ * // This would return ["@smoke"]
  */
 export function processTestTags(testInfo: TestInfo): string[] {
   const tagMatches = testInfo.title.match(/@\w+/g);

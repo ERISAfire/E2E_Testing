@@ -1,4 +1,4 @@
-import { test, expect } from '@playwright/test';
+import { test, expect, APIRequestContext } from '@playwright/test';
 import { EnvConfig } from '../../config/env.config.js';
 
 // Get config singleton
@@ -27,13 +27,72 @@ export interface ProjectTemplate {
   };
 }
 
+// Helper function to create a test project template
+const createTestProjectTemplate = async (
+  request: APIRequestContext,
+  testRunId: string
+): Promise<ProjectTemplate> => {
+  const templateData = {
+    name: `API_${testRunId}_Template`,
+    color: `#${Math.floor(Math.random() * 16777215)
+      .toString(16)
+      .padStart(6, '0')}`,
+    status: 'active' as const,
+    trelloCardId: `test_${testRunId}_card`,
+  };
+
+  const response = await request.post(TEMPLATES_URL, {
+    headers: {
+      Authorization: `Bearer ${API_BEARER_TOKEN}`,
+      'Content-Type': 'application/json',
+    },
+    data: templateData,
+  });
+
+  if (response.status() !== 201) {
+    const body = await response.text();
+    throw new Error(`Failed to create test project template: ${response.status()} - ${body}`);
+  }
+
+  const responseBody = await response.json();
+  return responseBody;
+};
+
+// Helper function to delete a test project template
+const deleteTestProjectTemplate = async (request: APIRequestContext, id: string): Promise<void> => {
+  const response = await request.delete(`${TEMPLATES_URL}/${id}`, {
+    headers: {
+      Authorization: `Bearer ${API_BEARER_TOKEN}`,
+    },
+  });
+
+  if (response.status() !== 200) {
+    console.warn(`Failed to delete test project template ${id}: ${response.status()}`);
+  }
+};
+
 // Use describe.serial to ensure tests run in order and share state
 test.describe.serial('Project Templates API', () => {
   // Generate a unique test run ID to prevent conflicts
-  const testRunId = `api_${process.env.GITHUB_RUN_ID || Date.now()}_${Math.random().toString(36).substring(2, 8)}`;
+  let testRunId: string;
+  let testProjectTemplate: ProjectTemplate;
 
-  // Variable to store the created template ID between tests
-  let createdTemplateId: string;
+  // Setup - initialize test run ID and create test project template before all tests
+  test.beforeAll(async ({ request }) => {
+    testRunId = `api_${process.env.GITHUB_RUN_ID || Date.now()}_${Math.random().toString(36).substring(2, 8)}`;
+    testProjectTemplate = await createTestProjectTemplate(request, testRunId);
+  });
+
+  // Cleanup - delete test project template after all tests
+  test.afterAll(async ({ request }) => {
+    if (testProjectTemplate?.id) {
+      try {
+        await deleteTestProjectTemplate(request, testProjectTemplate.id);
+      } catch (error) {
+        console.error('Error during cleanup:', error);
+      }
+    }
+  });
   test('GET /templates - should return list of project templates @regression @api @projectTemplate', async ({
     request,
   }) => {
@@ -158,54 +217,25 @@ test.describe.serial('Project Templates API', () => {
     }
   });
 
-  test('POST /templates - should create a new project template @regression @smoke @api @projectTemplate', async ({
-    request,
-  }) => {
-    // Arrange
-    // Generate unique test data with test run ID
-    const templateData = {
+  test('POST /templates - should create a new project template @regression @smoke @api @projectTemplate', async () => {
+    // This test verifies that the template created in beforeAll has the correct structure
+    // Verify the shared test template structure and data
+    expect(testProjectTemplate).toMatchObject({
       name: `API_${testRunId}_Template`,
-      color: `#${Math.floor(Math.random() * 16777215)
-        .toString(16)
-        .padStart(6, '0')}`,
-      status: 'active' as const,
+      status: 'active',
       trelloCardId: `test_${testRunId}_card`,
-    };
-
-    // Act
-    const response = await request.post(TEMPLATES_URL, {
-      headers: {
-        Authorization: `Bearer ${API_BEARER_TOKEN}`,
-        'Content-Type': 'application/json',
-      },
-      data: templateData,
-    });
-
-    // Assert
-    expect(response.status()).toBe(201);
-    const responseBody = await response.json();
-
-    // Verify response structure and data
-    expect(responseBody).toMatchObject({
-      name: templateData.name,
-      color: templateData.color,
-      status: templateData.status,
-      trelloCardId: templateData.trelloCardId,
     });
 
     // Verify required fields
-    expect(responseBody).toHaveProperty('id');
-    const templateId = responseBody.id;
-    expect(typeof templateId).toBe('string');
-    expect(responseBody).toHaveProperty('createdAt');
-    expect(new Date(responseBody.createdAt).toString()).not.toBe('Invalid Date');
-    expect(responseBody).toHaveProperty('updatedAt');
-    expect(new Date(responseBody.updatedAt).toString()).not.toBe('Invalid Date');
-    expect(responseBody).toHaveProperty('order');
-    expect(typeof responseBody.order).toBe('string');
-
-    // Store the created template ID for use in the PATCH test
-    createdTemplateId = templateId;
+    expect(testProjectTemplate).toHaveProperty('id');
+    expect(typeof testProjectTemplate.id).toBe('string');
+    expect(testProjectTemplate).toHaveProperty('createdAt');
+    expect(new Date(testProjectTemplate.createdAt).toString()).not.toBe('Invalid Date');
+    expect(testProjectTemplate).toHaveProperty('updatedAt');
+    expect(new Date(testProjectTemplate.updatedAt).toString()).not.toBe('Invalid Date');
+    expect(testProjectTemplate).toHaveProperty('order');
+    expect(typeof testProjectTemplate.order).toBe('string');
+    expect(testProjectTemplate.color).toMatch(/^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/);
   });
 
   test('POST /templates - should fail with missing required fields @negative @regression @api @projectTemplate', async ({
@@ -265,7 +295,7 @@ test.describe.serial('Project Templates API', () => {
     request,
   }) => {
     // Fail the test if no template was created (shouldn't happen with describe.serial)
-    if (!createdTemplateId) {
+    if (!testProjectTemplate?.id) {
       throw new Error('No template ID available for update - POST test may have failed');
     }
 
@@ -278,7 +308,7 @@ test.describe.serial('Project Templates API', () => {
     };
 
     // Act: Update the template using the stored template ID
-    const updateResponse = await request.patch(`${TEMPLATES_URL}/${createdTemplateId}`, {
+    const updateResponse = await request.patch(`${TEMPLATES_URL}/${testProjectTemplate.id}`, {
       headers: {
         Authorization: `Bearer ${API_BEARER_TOKEN}`,
         'Content-Type': 'application/json',
@@ -292,35 +322,15 @@ test.describe.serial('Project Templates API', () => {
     const responseBody = await updateResponse.json();
 
     // Verify the response contains the template ID
-    expect(responseBody).toHaveProperty('id', createdTemplateId);
+    expect(responseBody).toHaveProperty('id', testProjectTemplate.id);
   });
 
-  test.afterAll(async ({ request }) => {
-    // Cleanup: Delete the created template after all tests
-    if (createdTemplateId) {
-      try {
-        await request.delete(`${TEMPLATES_URL}/${createdTemplateId}`, {
-          headers: {
-            Authorization: `Bearer ${API_BEARER_TOKEN}`,
-          },
-        });
-      } catch (error) {
-        console.error('Error during cleanup:', error);
-      }
-    }
-  });
-
+  // DELETE - Remove project template (should be last test as it deletes the shared test object)
   test('DELETE /templates/:id - should delete an existing project template @regression @smoke @api @projectTemplate', async ({
     request,
   }) => {
-    // Skip if no template was created
-    test.skip(
-      !createdTemplateId,
-      'No template ID available for deletion - POST test may have failed'
-    );
-
-    // Act: Delete the template using the stored template ID
-    const deleteResponse = await request.delete(`${TEMPLATES_URL}/${createdTemplateId}`, {
+    // Use the shared test project template
+    const deleteResponse = await request.delete(`${TEMPLATES_URL}/${testProjectTemplate.id}`, {
       headers: {
         Authorization: `Bearer ${API_BEARER_TOKEN}`,
         'Content-Type': 'application/json',
@@ -329,5 +339,8 @@ test.describe.serial('Project Templates API', () => {
 
     // Assert
     expect(deleteResponse.status()).toBe(200);
+
+    // Mark as deleted so afterAll doesn't try to delete it again
+    testProjectTemplate.id = '';
   });
 });

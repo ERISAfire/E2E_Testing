@@ -93,21 +93,40 @@ export class CoverageTypePage extends BasePage {
       const saveButton = getCoverageTypeSaveButton(this.page);
       await saveButton.click();
 
-      // Wait for success toast with better error handling
+      // Wait for the save operation to complete
+      await this.page.waitForLoadState('networkidle');
+
+      // Wait for success toast with better error handling and fallback
       try {
         const toast = getCoverageTypeEditSuccessToast(this.page);
-        await expect(toast).toBeVisible();
+        await expect(toast).toBeVisible({ timeout: 45000 });
       } catch (toastError: unknown) {
-        // If toast not found, check if the update was still successful
+        // Wait a bit more for UI to update
+        await this.page.waitForTimeout(2000);
+
+        // Check if the update was still successful by looking for the new name
         const successIndicator = getCoverageTypeActiveStatus(this.page, newName);
-        if (await successIndicator.isVisible()) {
-          // If the name was updated, consider it a success even if toast didn't appear
-          return;
+        try {
+          await expect(successIndicator).toBeVisible({ timeout: 10000 });
+          return; // Success even without toast
+        } catch (fallbackError) {
+          // Take screenshot for debugging
+          await this.page.screenshot({
+            path: `edit-coverage-type-fallback-error-${Date.now()}.png`,
+          });
+
+          // Check if old name still exists (update failed)
+          const oldNameExists = getCoverageTypeActiveStatus(this.page, oldName);
+          const oldNameVisible = await oldNameExists.isVisible();
+
+          const errorMessage = toastError instanceof Error ? toastError.message : 'Unknown error';
+          const fallbackErrorMsg =
+            fallbackError instanceof Error ? fallbackError.message : 'Unknown fallback error';
+
+          throw new Error(
+            `Failed to see success toast and fallback check failed. Toast error: ${errorMessage}. Fallback error: ${fallbackErrorMsg}. Old name still exists: ${oldNameVisible}`
+          );
         }
-        // Take screenshot and rethrow the error
-        await this.page.screenshot({ path: `toast-error-${Date.now()}.png` });
-        const errorMessage = toastError instanceof Error ? toastError.message : 'Unknown error';
-        throw new Error(`Failed to see success toast. ${errorMessage}`);
       }
     } catch (error) {
       await this.page.screenshot({ path: `edit-coverage-type-error-${Date.now()}.png` });

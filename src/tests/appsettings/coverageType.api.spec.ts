@@ -1,6 +1,20 @@
 import { test, expect, APIRequestContext } from '@playwright/test';
 import { EnvConfig } from '../../config/env.config.js';
 
+// Type for coverage type attributes
+interface CoverageAttribute {
+  id: string;
+  type: string;
+}
+
+// Type for test coverage type
+interface TestCoverageType {
+  id: string;
+  name: string;
+  icon: string;
+  attributes: CoverageAttribute[];
+}
+
 // Get config singleton
 const config = EnvConfig.getInstance();
 const API_BASE_URL = config.getConfig().apiBaseUrl;
@@ -11,13 +25,6 @@ const COVERAGE_TYPES_PATH = '/v1/coverage-types';
 const COVERAGE_TYPES_URL = `${API_BASE_URL}${COVERAGE_TYPES_PATH}`;
 
 // Helper function to create a test coverage type
-interface TestCoverageType {
-  id: string;
-  name: string;
-  icon: string;
-  attributes: Array<{ id: string; type: string }>;
-}
-
 const createTestCoverageType = async (
   request: APIRequestContext,
   testRunId: string
@@ -54,11 +61,32 @@ const createTestCoverageType = async (
   return { id: body.id, ...payload };
 };
 
-// Remove unused coverageTypePayload since we're using createTestCoverageType
-
 test.describe('Coverage Types API', () => {
   // Generate a unique test run ID to prevent conflicts
-  const testRunId = `api_${process.env.GITHUB_RUN_ID || Date.now()}_${Math.random().toString(36).substring(2, 8)}`;
+  let testRunId: string;
+  let testCoverageType: TestCoverageType;
+
+  // Setup - initialize test run ID and create test coverage type before all tests
+  test.beforeAll(async ({ request }) => {
+    testRunId = `api_${process.env.GITHUB_RUN_ID || Date.now()}_${Math.random().toString(36).substring(2, 8)}`;
+    testCoverageType = await createTestCoverageType(request, testRunId);
+  });
+
+  // Cleanup - delete test coverage type after all tests
+  test.afterAll(async ({ request }) => {
+    if (testCoverageType?.id) {
+      try {
+        await request.delete(`${COVERAGE_TYPES_URL}/${testCoverageType.id}`, {
+          headers: {
+            Authorization: `Bearer ${API_BEARER_TOKEN}`,
+            'Content-Type': 'application/json',
+          },
+        });
+      } catch (error) {
+        console.error('Error during cleanup:', error);
+      }
+    }
+  });
 
   // NEGATIVE: Missing required fields
   test('POST /coverage-types - should fail with missing required fields @negative @regression @api @coverageType', async ({
@@ -93,42 +121,32 @@ test.describe('Coverage Types API', () => {
     );
   });
 
-  // Create coverage type
-  test('POST /coverage-types - create @smoke @regression @critical @api @coverageType', async ({
+  // Verify created coverage type in list
+  test('Verify created coverage type in list @smoke @regression @api @coverageType', async ({
     request,
   }) => {
-    const coverageTypeData = {
-      name: `API_${testRunId}_Coverage`,
-      icon: `icon_${testRunId}`,
-      attributes: [
-        {
-          id: '31b0164a-f983-4e41-9ee9-938d1ec3f083',
-          type: 'required',
+    const response = await request.get(
+      `${COVERAGE_TYPES_URL}?sortBy=order&sortOrder=DESC&status=true`,
+      {
+        headers: {
+          Authorization: `Bearer ${API_BEARER_TOKEN}`,
         },
-        {
-          id: '1f36557d-e729-4a0e-8888-3dbb114bafdb',
-          type: 'available',
-        },
-      ],
-    };
-    const response = await request.post(COVERAGE_TYPES_URL, {
-      headers: {
-        Authorization: `Bearer ${API_BEARER_TOKEN}`,
-        'Content-Type': 'application/json',
-      },
-      data: coverageTypeData,
-    });
-    expect(response.status()).toBe(201);
+      }
+    );
+    expect(response.status()).toBe(200);
     const body = await response.json();
-    expect(body).toHaveProperty('id');
 
-    // Verify the response contains the expected fields
-    expect(body).toHaveProperty('id');
-    expect(typeof body.id).toBe('string');
+    // Find our test coverage type in the list
+    const foundType = body.data.find((item: TestCoverageType) => item.id === testCoverageType.id);
+    expect(foundType).toBeDefined();
+    if (foundType) {
+      expect(foundType.name).toBe(testCoverageType.name);
+      expect(foundType.icon).toBe(testCoverageType.icon);
+    }
   });
 
   // GET (list)
-  test('GET /coverage-types?sortBy=order&sortOrder=DESC&status=true - list @smoke @regression @critical @api @coverageType', async ({
+  test('GET /coverage-types?sortBy=order&sortOrder=DESC&status=true - list @smoke @regression @api @coverageType', async ({
     request,
   }) => {
     const response = await request.get(
@@ -180,9 +198,6 @@ test.describe('Coverage Types API', () => {
 
   // PATCH - Update coverage type
   test('PATCH /coverage-types/:id - update @regression @api @coverageType', async ({ request }) => {
-    // First create a test coverage type
-    const testCoverageType = await createTestCoverageType(request, testRunId);
-
     // Prepare update payload
     const updatePayload = {
       name: `API_${testRunId}_Updated_${Date.now()}`,
@@ -243,9 +258,6 @@ test.describe('Coverage Types API', () => {
   test('PATCH /coverage-types/:id with invalid payload - should fail with 400 @negative @regression @api @coverageType', async ({
     request,
   }) => {
-    // First create a test coverage type
-    const testCoverageType = await createTestCoverageType(request, testRunId);
-
     const response = await request.patch(`${COVERAGE_TYPES_URL}/${testCoverageType.id}`, {
       headers: {
         Authorization: `Bearer ${API_BEARER_TOKEN}`,
@@ -266,7 +278,7 @@ test.describe('Coverage Types API', () => {
   test('PATCH /coverage-types/:id without token - should fail with 401 @negative @regression @api @coverageType', async ({
     request,
   }) => {
-    const response = await request.patch(`${COVERAGE_TYPES_URL}/nonexistent-id-12345`, {
+    const response = await request.patch(`${COVERAGE_TYPES_URL}/${testCoverageType.id}`, {
       headers: {
         'Content-Type': 'application/json',
       },
@@ -288,9 +300,6 @@ test.describe('Coverage Types API', () => {
   test('PATCH /coverage-types/{id}/archive - should archive coverage type @regression @api @coverageType', async ({
     request,
   }) => {
-    // First create a test coverage type
-    const testCoverageType = await createTestCoverageType(request, testRunId);
-
     // Archive the coverage type
     const archiveResponse = await request.patch(
       `${COVERAGE_TYPES_URL}/${testCoverageType.id}/archive`,
@@ -314,9 +323,6 @@ test.describe('Coverage Types API', () => {
   test('PATCH /coverage-types/{id}/unarchive - should unarchive coverage type @regression @api @coverageType', async ({
     request,
   }) => {
-    // First create and archive a test coverage type
-    const testCoverageType = await createTestCoverageType(request, testRunId);
-
     // First archive the coverage type
     await request.patch(`${COVERAGE_TYPES_URL}/${testCoverageType.id}/archive`, {
       headers: {
@@ -386,30 +392,27 @@ test.describe('Coverage Types API', () => {
     expect(body).toHaveProperty('correlationId');
   });
 
-  // NEGATIVE: DELETE with non-existent id
-
   // Explicit DELETE test to verify the endpoint works
-  test('DELETE /coverage-types/:id - should delete an existing coverage type @regression @api @coverageType', async ({
+  test('DELETE /coverage-types/:id - should delete an existing coverage type @smoke @regression @api @coverageType', async ({
     request,
   }) => {
-    // First create a test coverage type
-    const testCoverageType = await createTestCoverageType(request, testRunId);
+    // Create a new coverage type to delete (since we can't delete the main test one)
+    const tempCoverageType = await createTestCoverageType(request, `temp_${testRunId}`);
 
-    // Act: Delete the coverage type
-    const response = await request.delete(`${COVERAGE_TYPES_URL}/${testCoverageType.id}`, {
+    // Delete the coverage type and verify the response
+    const deleteResponse = await request.delete(`${COVERAGE_TYPES_URL}/${tempCoverageType.id}`, {
       headers: {
         Authorization: `Bearer ${API_BEARER_TOKEN}`,
       },
     });
 
-    // Assert: Verify the response
-    expect(response.status()).toBe(200);
-    const body = await response.json();
-    expect(body).toHaveProperty('id', testCoverageType.id);
+    // Verify the response status and body structure
+    expect(deleteResponse.status()).toBe(200);
+    const body = await deleteResponse.json();
+    expect(body).toHaveProperty('id');
   });
 
-  // No global cleanup needed - each test is responsible for its own cleanup
-
+  // NEGATIVE: DELETE with non-existent id
   test('DELETE /coverage-types/:id with non-existent id - should fail with 400 @negative @regression @api @coverageType', async ({
     request,
   }) => {

@@ -165,6 +165,9 @@ test.describe.serial('Coverage Attribute API', () => {
     const body = JSON.parse(responseBody);
     expect(body).toHaveProperty('id');
     expect(typeof body.id).toBe('string');
+
+    // Clean up - delete the created coverage attribute
+    await deleteTestCoverageAttribute(request, body.id);
   });
 
   // GET (list)
@@ -321,7 +324,7 @@ test.describe.serial('Coverage Attribute API', () => {
   });
 
   // DELETE - Remove coverage attribute (should be last test as it deletes the shared test object)
-  test('DELETE /coverage-attributes/:id - should delete an existing coverage attribute @smoke @regression @api @coverageAttribute', async ({
+  test('DELETE /coverage-attributes/:id - should delete an existing coverage attribute @regression @api @coverageAttribute', async ({
     request,
   }) => {
     // Use the shared test coverage attribute

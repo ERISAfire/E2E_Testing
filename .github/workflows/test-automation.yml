@@ -91,7 +91,7 @@ jobs:
           elif [[ "${{ github.event.inputs.testTags }}" == "@coverageType" ]]; then
             NODE_OPTIONS='--loader ts-node/esm' npx playwright test --workers=2 --grep "@coverageType.*@ui" --reporter=list,allure-playwright
           elif [[ "${{ github.event.inputs.testTags }}" == "@auth" ]]; then
-            NODE_OPTIONS='--loader ts-node/esm' npx playwright test --workers=2 --grep "@auth.*@ui" --reporter=list,allure-playwright
+            NODE_OPTIONS='--loader ts-node/esm' npx playwright test --workers=2 --grep "@auth" --reporter=list,allure-playwright
           elif [[ "${{ github.event.inputs.testTags }}" == "@coverageAttribute" ]]; then
             NODE_OPTIONS='--loader ts-node/esm' npx playwright test --workers=2 --grep "@coverageAttribute.*@ui" --reporter=list,allure-playwright
           elif [[ "${{ github.event.inputs.testTags }}" == "@projectTemplate" ]]; then

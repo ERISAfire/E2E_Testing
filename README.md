@@ -343,7 +343,6 @@ The workflow runs tests in two parallel sections:
 - `@api` → All API tests
 - `@regression` → Regression API tests only
 - `@smoke` → Smoke API tests only
-- `@auth` → Auth API tests only
 - `@coverageAttribute` → Coverage attribute API tests only
 - `@coverageType` → Coverage type API tests only
 - `@projectTemplate` → Project template API tests only
@@ -353,7 +352,7 @@ The workflow runs tests in two parallel sections:
 - `@ui` → All UI tests
 - `@regression` → Regression UI tests only
 - `@smoke` → Smoke UI tests only
-- `@auth` → Auth UI tests only
+- `@auth` → Auth UI tests only (no API tests exist)
 - `@coverageAttribute` → Coverage attribute UI tests only
 - `@coverageType` → Coverage type UI tests only
 - `@projectTemplate` → Project template UI tests only
@@ -362,7 +361,7 @@ The workflow runs tests in two parallel sections:
 
 - `@api` → API section only (all API tests)
 - `@ui` → UI section only (all UI tests)
-- `@auth` → Both sections (auth API tests + auth UI tests)
+- `@auth` → UI section only (3 auth UI tests, no API tests)
 - `@regression` → Both sections (regression API tests + regression UI tests)
 - `@coverageType` → Both sections (coverageType API tests + coverageType UI tests)
 

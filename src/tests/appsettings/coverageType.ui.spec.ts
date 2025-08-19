@@ -3,7 +3,7 @@ import { LoginPage } from '../../ui/pages/LoginPage.js';
 import { CoverageTypePage } from '../../ui/pages/CoverageTypePage.js';
 
 test.describe.serial('Coverage Types UI E2E', () => {
-  test('should create, edit and delete a coverage type @smoke @regression @ui @e2e @coverageType', async ({
+  test('should create, edit, delete a coverage type and validate form fields @smoke @regression @ui @coverageType', async ({
     page,
   }) => {
     const loginPage = new LoginPage(page);

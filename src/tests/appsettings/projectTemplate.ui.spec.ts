@@ -4,7 +4,7 @@ import { ProjectTemplatePage } from '../../ui/pages/ProjectTemplatePage.js';
 import { DateUtils } from '../../core/utils/date.utils.js';
 
 test.describe('Project Templates UI E2E', () => {
-  test('should create, edit and delete a project template @smoke @regression @ui @e2e @projectTemplate', async ({
+  test('should create, edit, delete a project template and validate form fields @smoke @regression @ui @projectTemplate', async ({
     page,
   }) => {
     const loginPage = new LoginPage(page);

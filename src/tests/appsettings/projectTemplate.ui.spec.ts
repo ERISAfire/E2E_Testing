@@ -3,7 +3,7 @@ import { LoginPage } from '../../ui/pages/LoginPage.js';
 import { ProjectTemplatePage } from '../../ui/pages/ProjectTemplatePage.js';
 import { DateUtils } from '../../core/utils/date.utils.js';
 
-test.describe('Project Templates UI E2E', () => {
+test.describe.serial('Project Templates UI E2E', () => {
   test('should create, edit, delete a project template and validate form fields @smoke @regression @ui @projectTemplate', async ({
     page,
   }) => {

@@ -61,7 +61,7 @@ const createTestCoverageType = async (
   return { id: body.id, ...payload };
 };
 
-test.describe('Coverage Types API', () => {
+test.describe.serial('Coverage Types API', () => {
   // Generate a unique test run ID to prevent conflicts
   let testRunId: string;
   let testCoverageType: TestCoverageType;

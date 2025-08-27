@@ -2,7 +2,7 @@ import { test } from '@playwright/test';
 import 'dotenv/config';
 import { CoverageAttributePage } from '../../ui/pages/CoverageAttributePage.js';
 
-test.describe('Coverage Attribute UI E2E', () => {
+test.describe.serial('Coverage Attribute UI E2E', () => {
   test('should create, edit, delete coverage attribute and validate form fields @smoke @regression @ui @coverageAttribute', async ({
     page,
   }) => {

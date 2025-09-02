@@ -161,7 +161,7 @@ export class ComplianceEventRulePage extends BasePage {
     // Wait for UI to stabilize after all selections
     await this.page.waitForTimeout(2000);
 
-    // Fill the date fields using the updated selectors with retry logic for CI
+    // Fill the date fields - bypass calendar modal by typing directly
     try {
       // Wait for date fields to be visible
       await getEarliestPossibleEventDateInput(this.page).waitFor({
@@ -173,12 +173,9 @@ export class ComplianceEventRulePage extends BasePage {
         timeout: 10000,
       });
 
-      // Fill the date fields
-      await getEarliestPossibleEventDateInput(this.page).click();
-      await getEarliestPossibleEventDateInput(this.page).fill('01/01/2030');
-
-      await getLatestPossibleEventDateInput(this.page).click();
-      await getLatestPossibleEventDateInput(this.page).fill('01/01/2040');
+      // Fill the date fields directly without clicking (to avoid calendar modal)
+      await getEarliestPossibleEventDateInput(this.page).fill('01/01/2030', { force: true });
+      await getLatestPossibleEventDateInput(this.page).fill('01/01/2040', { force: true });
 
       // Verify the fields were filled
       const earliestValue = await getEarliestPossibleEventDateInput(this.page).inputValue();
@@ -190,25 +187,36 @@ export class ComplianceEventRulePage extends BasePage {
         throw new Error('Date fields were not filled successfully');
       }
     } catch (error) {
-      console.log('Primary date selectors failed, trying CSS fallback selectors:', error);
+      console.log('Primary date selectors failed, trying alternative approach:', error);
 
-      // Fallback to CSS selectors
-      const earliestFieldCSS = this.page.locator('input[placeholder*="MM/DD/YYYY"]').first();
-      const latestFieldCSS = this.page.locator('input[placeholder*="MM/DD/YYYY"]').nth(1);
+      // Alternative approach: use keyboard input
+      try {
+        const earliestField = getEarliestPossibleEventDateInput(this.page);
+        const latestField = getLatestPossibleEventDateInput(this.page);
 
-      await earliestFieldCSS.waitFor({ state: 'visible', timeout: 10000 });
-      await latestFieldCSS.waitFor({ state: 'visible', timeout: 10000 });
+        // Focus and type directly
+        await earliestField.focus();
+        await earliestField.pressSequentially('01/01/2030', { delay: 100 });
 
-      await earliestFieldCSS.click();
-      await earliestFieldCSS.fill('01/01/2030');
+        await latestField.focus();
+        await latestField.pressSequentially('01/01/2040', { delay: 100 });
 
-      await latestFieldCSS.click();
-      await latestFieldCSS.fill('01/01/2040');
+        const earliestValue = await earliestField.inputValue();
+        const latestValue = await latestField.inputValue();
 
-      const earliestValueCSS = await earliestFieldCSS.inputValue();
-      const latestValueCSS = await latestFieldCSS.inputValue();
+        console.log(`Keyboard input - Earliest: ${earliestValue}, Latest: ${latestValue}`);
+      } catch (keyboardError) {
+        console.log('Keyboard approach failed, trying CSS selectors:', keyboardError);
 
-      console.log(`CSS fallback - Earliest: ${earliestValueCSS}, Latest: ${latestValueCSS}`);
+        // Final fallback to CSS selectors with force
+        const earliestFieldCSS = this.page.locator('input[placeholder*="MM/DD/YYYY"]').first();
+        const latestFieldCSS = this.page.locator('input[placeholder*="MM/DD/YYYY"]').nth(1);
+
+        await earliestFieldCSS.fill('01/01/2030', { force: true });
+        await latestFieldCSS.fill('01/01/2040', { force: true });
+
+        console.log('Used CSS selectors with force');
+      }
     }
 
     await getReminderSpinButton(this.page).fill('1');

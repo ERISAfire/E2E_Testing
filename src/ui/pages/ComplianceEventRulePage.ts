@@ -161,9 +161,56 @@ export class ComplianceEventRulePage extends BasePage {
     // Wait for UI to stabilize after all selections
     await this.page.waitForTimeout(2000);
 
-    // Fill the date fields using the updated selectors
-    await getEarliestPossibleEventDateInput(this.page).fill('01/01/2030');
-    await getLatestPossibleEventDateInput(this.page).fill('01/01/2040');
+    // Fill the date fields using the updated selectors with retry logic for CI
+    try {
+      // Wait for date fields to be visible
+      await getEarliestPossibleEventDateInput(this.page).waitFor({
+        state: 'visible',
+        timeout: 10000,
+      });
+      await getLatestPossibleEventDateInput(this.page).waitFor({
+        state: 'visible',
+        timeout: 10000,
+      });
+
+      // Fill the date fields
+      await getEarliestPossibleEventDateInput(this.page).click();
+      await getEarliestPossibleEventDateInput(this.page).fill('01/01/2030');
+
+      await getLatestPossibleEventDateInput(this.page).click();
+      await getLatestPossibleEventDateInput(this.page).fill('01/01/2040');
+
+      // Verify the fields were filled
+      const earliestValue = await getEarliestPossibleEventDateInput(this.page).inputValue();
+      const latestValue = await getLatestPossibleEventDateInput(this.page).inputValue();
+
+      console.log(`Date fields filled - Earliest: ${earliestValue}, Latest: ${latestValue}`);
+
+      if (!earliestValue || !latestValue) {
+        throw new Error('Date fields were not filled successfully');
+      }
+    } catch (error) {
+      console.log('Primary date selectors failed, trying CSS fallback selectors:', error);
+
+      // Fallback to CSS selectors
+      const earliestFieldCSS = this.page.locator('input[placeholder*="MM/DD/YYYY"]').first();
+      const latestFieldCSS = this.page.locator('input[placeholder*="MM/DD/YYYY"]').nth(1);
+
+      await earliestFieldCSS.waitFor({ state: 'visible', timeout: 10000 });
+      await latestFieldCSS.waitFor({ state: 'visible', timeout: 10000 });
+
+      await earliestFieldCSS.click();
+      await earliestFieldCSS.fill('01/01/2030');
+
+      await latestFieldCSS.click();
+      await latestFieldCSS.fill('01/01/2040');
+
+      const earliestValueCSS = await earliestFieldCSS.inputValue();
+      const latestValueCSS = await latestFieldCSS.inputValue();
+
+      console.log(`CSS fallback - Earliest: ${earliestValueCSS}, Latest: ${latestValueCSS}`);
+    }
+
     await getReminderSpinButton(this.page).fill('1');
 
     await getModalContent(this.page).click();

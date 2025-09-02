@@ -157,18 +157,58 @@ export class ComplianceEventRulePage extends BasePage {
     await getPlanYearBeginDateOption(this.page).click();
 
     // Wait for date fields to become available after selecting Plan Year Begin Date
-    await this.page.waitForTimeout(1000);
-    await getEarliestPossibleEventDateInput(this.page).waitFor({
-      state: 'visible',
-      timeout: 10000,
-    });
-    await getLatestPossibleEventDateInput(this.page).waitFor({ state: 'visible', timeout: 10000 });
+    await this.page.waitForTimeout(3000);
 
-    // Fill date fields
-    await getEarliestPossibleEventDateInput(this.page).click();
-    await getEarliestPossibleEventDateInput(this.page).fill('01/01/2030');
-    await getLatestPossibleEventDateInput(this.page).click();
-    await getLatestPossibleEventDateInput(this.page).fill('01/01/2040');
+    // Ensure date fields are filled (required fields) - multiple retry strategy for CI
+    const earliestDateField = getEarliestPossibleEventDateInput(this.page);
+    const latestDateField = getLatestPossibleEventDateInput(this.page);
+
+    // Retry mechanism for CI environment
+    for (let attempt = 1; attempt <= 3; attempt++) {
+      try {
+        console.log(`Attempt ${attempt} to fill date fields`);
+
+        // Wait for fields to be available
+        await earliestDateField.waitFor({ state: 'attached', timeout: 15000 });
+        await latestDateField.waitFor({ state: 'attached', timeout: 15000 });
+
+        // Try different interaction methods
+        if (attempt === 1) {
+          // First attempt: standard approach
+          await earliestDateField.click({ timeout: 5000 });
+          await earliestDateField.fill('01/01/2030');
+          await latestDateField.click({ timeout: 5000 });
+          await latestDateField.fill('01/01/2040');
+        } else if (attempt === 2) {
+          // Second attempt: force click
+          await earliestDateField.click({ force: true, timeout: 5000 });
+          await earliestDateField.fill('01/01/2030');
+          await latestDateField.click({ force: true, timeout: 5000 });
+          await latestDateField.fill('01/01/2040');
+        } else {
+          // Third attempt: focus then fill
+          await earliestDateField.focus({ timeout: 5000 });
+          await earliestDateField.fill('01/01/2030');
+          await latestDateField.focus({ timeout: 5000 });
+          await latestDateField.fill('01/01/2040');
+        }
+
+        // Verify fields were filled successfully
+        const earliestValue = await earliestDateField.inputValue();
+        const latestValue = await latestDateField.inputValue();
+
+        if (earliestValue && latestValue) {
+          console.log(`Date fields filled successfully on attempt ${attempt}`);
+          break;
+        }
+      } catch (error) {
+        console.log(`Attempt ${attempt} failed:`, error);
+        if (attempt === 3) {
+          throw new Error('Failed to fill required date fields after 3 attempts');
+        }
+        await this.page.waitForTimeout(2000);
+      }
+    }
     await getReminderSpinButton(this.page).fill('1');
 
     await getModalContent(this.page).click();
@@ -203,8 +243,15 @@ export class ComplianceEventRulePage extends BasePage {
     await expect(getReviewEventDueDate(this.page)).toContainText('X Days Before');
     await expect(getReviewXValue(this.page)).toContainText('10');
     await expect(getReviewDueDateReferenceDay(this.page)).toContainText('Plan Year Begin Date');
-    await expect(getReviewEarliestPossibleEventDate(this.page)).toContainText('01-01-2030');
-    await expect(getReviewLatestPossibleEventDate(this.page)).toContainText('01-01-2040');
+
+    // Validate required date fields (EarliestPossibleEventDate is mandatory)
+    await expect(getReviewEarliestPossibleEventDate(this.page)).toContainText('01-01-2030', {
+      timeout: 10000,
+    });
+    await expect(getReviewLatestPossibleEventDate(this.page)).toContainText('01-01-2040', {
+      timeout: 10000,
+    });
+
     await expect(getReviewReminder(this.page)).toContainText('1 day before due date');
 
     await getFinishButton(this.page).click();

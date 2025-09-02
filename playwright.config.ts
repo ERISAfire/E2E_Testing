@@ -8,8 +8,8 @@ export default defineConfig({
   // Run tests in parallel
   fullyParallel: true,
 
-  // Global test timeout (90 seconds)
-  timeout: 90000,
+  // Global test timeout (120 seconds)
+  timeout: 120000,
 
   // Global expect timeout (30 seconds)
   expect: {

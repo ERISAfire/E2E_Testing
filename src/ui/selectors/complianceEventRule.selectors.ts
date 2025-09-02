@@ -53,10 +53,17 @@ export const getDueDateReferenceCombo = (page: Page): Locator =>
   page.getByRole('combobox', { name: 'Due date reference day Select' });
 
 export const getEarliestPossibleEventDateInput = (page: Page): Locator =>
-  page.getByRole('textbox', { name: 'Earliest possible event date' });
+  page.getByPlaceholder('MM/DD/YYYY').first();
 
 export const getLatestPossibleEventDateInput = (page: Page): Locator =>
-  page.getByRole('textbox', { name: 'Latest possible event date' });
+  page.getByPlaceholder('MM/DD/YYYY').nth(1);
+
+// Alternative CSS selectors for date fields (CI fallback)
+export const getEarliestPossibleEventDateInputCSS = (page: Page): Locator =>
+  page.locator('input[placeholder*="MM/DD/YYYY"]').first();
+
+export const getLatestPossibleEventDateInputCSS = (page: Page): Locator =>
+  page.locator('input[placeholder*="MM/DD/YYYY"]').nth(1);
 
 export const getReminderSpinButton = (page: Page): Locator =>
   page.getByRole('spinbutton', { name: 'Reminder' });

@@ -155,9 +155,19 @@ export class ComplianceEventRulePage extends BasePage {
     await getDaysBeforeSpinButton(this.page).fill('10');
     await getDueDateReferenceCombo(this.page).click();
     await getPlanYearBeginDateOption(this.page).click();
-    await getEarliestPossibleEventDateInput(this.page).focus();
+
+    // Wait for date fields to become available after selecting Plan Year Begin Date
+    await this.page.waitForTimeout(1000);
+    await getEarliestPossibleEventDateInput(this.page).waitFor({
+      state: 'visible',
+      timeout: 10000,
+    });
+    await getLatestPossibleEventDateInput(this.page).waitFor({ state: 'visible', timeout: 10000 });
+
+    // Fill date fields
+    await getEarliestPossibleEventDateInput(this.page).click();
     await getEarliestPossibleEventDateInput(this.page).fill('01/01/2030');
-    await getLatestPossibleEventDateInput(this.page).focus();
+    await getLatestPossibleEventDateInput(this.page).click();
     await getLatestPossibleEventDateInput(this.page).fill('01/01/2040');
     await getReminderSpinButton(this.page).fill('1');
 

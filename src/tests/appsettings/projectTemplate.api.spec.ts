@@ -265,7 +265,7 @@ test.describe.serial('Project Templates API', () => {
     });
   });
 
-  test.skip('POST /templates - should fail with invalid status @negative @regression @api @projectTemplate', async ({
+  test('POST /templates - should fail with invalid status @negative @regression @api @projectTemplate', async ({
     request,
   }) => {
     // Arrange

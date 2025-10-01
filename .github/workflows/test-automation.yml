@@ -67,6 +67,8 @@ jobs:
             NODE_OPTIONS='--loader ts-node/esm' npx playwright test --workers=2 --grep "@regression.*@api" --reporter=list,allure-playwright
           elif [[ "${{ github.event.inputs.testTags }}" == "@smoke" ]]; then
             NODE_OPTIONS='--loader ts-node/esm' npx playwright test --workers=2 --grep "@smoke.*@api" --reporter=list,allure-playwright
+          elif [[ "${{ github.event.inputs.testTags }}" == "@plans" ]]; then
+            NODE_OPTIONS='--loader ts-node/esm' npx playwright test --workers=2 --grep "@api.*@plans" --reporter=list,allure-playwright
           elif [[ "${{ github.event.inputs.testTags }}" == "@coverageType" ]]; then
             NODE_OPTIONS='--loader ts-node/esm' npx playwright test --workers=2 --grep "@api.*@coverageType" --reporter=list,allure-playwright
           elif [[ "${{ github.event.inputs.testTags }}" == "@coverageAttribute" ]]; then
@@ -90,6 +92,8 @@ jobs:
             NODE_OPTIONS='--loader ts-node/esm' npx playwright test --workers=2 --grep "@regression.*@ui" --reporter=list,allure-playwright
           elif [[ "${{ github.event.inputs.testTags }}" == "@smoke" ]]; then
             NODE_OPTIONS='--loader ts-node/esm' npx playwright test --workers=2 --grep "@smoke.*@ui" --reporter=list,allure-playwright
+          elif [[ "${{ github.event.inputs.testTags }}" == "@plans" ]]; then
+            NODE_OPTIONS='--loader ts-node/esm' npx playwright test --workers=2 --grep "@ui.*@plans" --reporter=list,allure-playwright
           elif [[ "${{ github.event.inputs.testTags }}" == "@coverageType" ]]; then
             NODE_OPTIONS='--loader ts-node/esm' npx playwright test --workers=2 --grep "@ui.*@coverageType" --reporter=list,allure-playwright
           elif [[ "${{ github.event.inputs.testTags }}" == "@auth" ]]; then

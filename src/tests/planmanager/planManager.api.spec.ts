@@ -111,7 +111,7 @@ const deleteTestPlan = async (request: APIRequestContext, id: string): Promise<v
 
 // Spec
 
-test.describe.serial('Plan Manager API @api @plans', () => {
+test.describe.serial('Plan Manager API', () => {
   let createdPlanId: string;
   const employerId = 79; // from user's sample
   let createdPlanSnapshot: PlanListItem | undefined;

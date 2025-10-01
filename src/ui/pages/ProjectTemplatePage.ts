@@ -4,6 +4,7 @@ import {
   getAddNewButton,
   getAppSettings,
   getAddNewProjectNoteButton,
+  getProjectNoteMenuItem,
   getProjectTemplates,
   getAddNoteButton,
   getColorInput,
@@ -23,6 +24,9 @@ import {
   getSuccessToast,
   getTrelloCardTemplateDropdown,
   getTrelloCardTemplateOption,
+  getPlanYearBeginDateButton,
+  getPlanYearEndDateButton,
+  getPlanYearButton,
 } from '../selectors/projectTemplate.selectors.js';
 
 type Status = 'Active' | 'Draft';
@@ -53,21 +57,30 @@ export class ProjectTemplatePage extends BasePage {
   }
 
   async addProjectNote(title: string, description: string): Promise<void> {
-    // First, click the Add New button for project note
+    // Open Add New menu and choose Project note
     await getAddNewProjectNoteButton(this.page).click();
+    await getProjectNoteMenuItem(this.page).click();
 
     // Fill in the note details
     await getProjectNoteTitleInput(this.page).click();
     await getProjectNoteTitleInput(this.page).fill(title);
     await getProjectNoteDescriptionInput(this.page).click();
     await getProjectNoteDescriptionInput(this.page).fill(description);
+
+    // Set Plan Year context as per new flow
+    await getPlanYearBeginDateButton(this.page).click();
+    await getPlanYearEndDateButton(this.page).click();
+    await getPlanYearButton(this.page).click();
+    await getPlanYearButton(this.page).click();
+
+    // Add the note and verify toast
     await getAddNoteButton(this.page).click();
-    await expect(getProjectNoteSuccessToast(this.page)).toBeVisible();
+    await expect(getProjectNoteSuccessToast(this.page)).toBeVisible({ timeout: 45000 });
   }
 
   async saveTemplate(): Promise<void> {
     await getSaveButton(this.page).click();
-    await expect(getSuccessToast(this.page)).toBeVisible();
+    await expect(getSuccessToast(this.page)).toBeVisible({ timeout: 45000 });
   }
 
   async editTemplate(

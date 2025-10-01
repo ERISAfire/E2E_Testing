@@ -334,8 +334,7 @@ export class ComplianceEventRulePage extends BasePage {
     newData: Partial<ComplianceEventRuleData>
   ): Promise<void> {
     // Wait for UI to stabilize after previous actions
-    await this.page.waitForLoadState('networkidle');
-    await this.page.waitForTimeout(2000);
+    await this.waitForUiIdle();
 
     // Find the compliance event rule row and click the three-dot menu
     const threeDotsButton = getThreeDotsMenuButton(this.page, currentName);
@@ -395,8 +394,7 @@ export class ComplianceEventRulePage extends BasePage {
     expectedData: { helpUrl?: string; preventDuplicationRule?: string }
   ): Promise<void> {
     // Wait for the page to be fully loaded and expand button to be enabled
-    await this.page.waitForLoadState('networkidle');
-    await this.page.waitForTimeout(2000); // Additional wait for UI to stabilize
+    await this.waitForUiIdle();
 
     // Expand the created rule row
     const expandButton = getExpandRowButton(this.page, name);
@@ -426,8 +424,7 @@ export class ComplianceEventRulePage extends BasePage {
 
   async deleteComplianceEventRule(name: string): Promise<void> {
     // Wait for UI to stabilize after previous actions
-    await this.page.waitForLoadState('networkidle');
-    await this.page.waitForTimeout(2000);
+    await this.waitForUiIdle();
 
     // Find the compliance event rule row and click the three-dot menu
     const threeDotsButton = getThreeDotsMenuButton(this.page, name);
@@ -485,5 +482,33 @@ export class ComplianceEventRulePage extends BasePage {
   async waitForPageLoad(): Promise<void> {
     // Wait for the compliance event rules page to load
     await expect(getComplianceEventRulesCreateButton(this.page)).toBeVisible({ timeout: 30000 });
+  }
+
+  private async waitForUiIdle(): Promise<void> {
+    // Avoid relying on networkidle which can hang due to background polling on SPAs
+    // Instead, wait for common loading indicators to disappear and add a short settle delay
+    const selectors = [
+      '[role="progressbar"]',
+      '[data-testid="loading"]',
+      '.MuiBackdrop-root',
+      '.MuiCircularProgress-root',
+      '[aria-busy="true"]',
+    ];
+
+    for (const sel of selectors) {
+      const loc = this.page.locator(sel);
+      // If the locator exists on the page, wait for it to detach or become hidden
+      if (await loc.count()) {
+        await Promise.race([
+          loc.first().waitFor({ state: 'detached', timeout: 15000 }),
+          loc.first().waitFor({ state: 'hidden', timeout: 15000 }),
+        ]).catch(() => {
+          // Swallow timeout: some apps keep a hidden progressbar mounted
+        });
+      }
+    }
+
+    // Short settle time
+    await this.page.waitForTimeout(500);
   }
 }

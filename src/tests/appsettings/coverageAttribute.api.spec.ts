@@ -324,7 +324,7 @@ test.describe.serial('Coverage Attribute API', () => {
   });
 
   // DELETE - Remove coverage attribute (should be last test as it deletes the shared test object)
-  test('DELETE /coverage-attributes/:id - should delete an existing coverage attribute @regression @api @coverageAttribute', async ({
+  test('DELETE /coverage-attributes/:id - should delete an existing coverage attribute @smoke @regression @api @coverageAttribute', async ({
     request,
   }) => {
     // Use the shared test coverage attribute

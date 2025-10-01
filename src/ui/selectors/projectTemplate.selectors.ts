@@ -32,6 +32,9 @@ export const getTrelloCardTemplateOption = (page: Page): Locator =>
 export const getAddNewProjectNoteButton = (page: Page): Locator =>
   page.getByRole('button', { name: 'Add New' });
 
+export const getProjectNoteMenuItem = (page: Page): Locator =>
+  page.getByRole('menuitem', { name: 'Project note' });
+
 export const getProjectNoteTitleInput = (page: Page): Locator => page.getByLabel('Title');
 
 export const getProjectNoteDescriptionInput = (page: Page): Locator =>
@@ -43,6 +46,16 @@ export const getProjectNoteDescriptionInput = (page: Page): Locator =>
     .nth(3);
 
 export const getAddNoteButton = (page: Page): Locator => page.getByRole('button', { name: 'Add' });
+
+// Plan Year controls inside Project Note
+export const getPlanYearBeginDateButton = (page: Page): Locator =>
+  page.getByRole('button', { name: 'Plan year begin date' });
+
+export const getPlanYearEndDateButton = (page: Page): Locator =>
+  page.getByRole('button', { name: 'Plan year end date' });
+
+export const getPlanYearButton = (page: Page): Locator =>
+  page.getByRole('button', { name: 'Plan year', exact: true });
 
 // Actions
 export const getSaveButton = (page: Page): Locator => page.getByRole('button', { name: 'Save' });

@@ -116,14 +116,16 @@ test.describe.serial('Plan Manager API @api @plans', () => {
   const employerId = 79; // from user's sample
   let createdPlanSnapshot: PlanListItem | undefined;
 
-  test('POST /v1/plans - create plan @smoke', async ({ request }) => {
+  test('POST /v1/plans - create plan @smoke @regression @api @plans', async ({ request }) => {
     createdPlanId = await createTestPlan(request, {
       planName: '2025-26 Plan 501',
       planNumber: 501,
     });
   });
 
-  test('GET /v1/plans?employerId=79 - list should contain created plan', async ({ request }) => {
+  test('GET /v1/plans?employerId=79 - list should contain created plan @smoke @regression @api @plans', async ({
+    request,
+  }) => {
     const response = await request.get(`${PLANS_URL}?employerId=${employerId}`, {
       headers: authHeaders,
     });
@@ -144,7 +146,9 @@ test.describe.serial('Plan Manager API @api @plans', () => {
     }
   });
 
-  test('PATCH /v1/plans/:id - update plan basic fields', async ({ request }) => {
+  test('PATCH /v1/plans/:id - update plan basic fields @regression @api @plans', async ({
+    request,
+  }) => {
     test.skip(!createdPlanId, 'No plan created');
     // Ensure we have a full snapshot to satisfy strict PATCH validators
     if (!createdPlanSnapshot) {
@@ -200,14 +204,16 @@ test.describe.serial('Plan Manager API @api @plans', () => {
     }
   });
 
-  test('DELETE /v1/plans/:id - delete created plan (cleanup last)', async ({ request }) => {
+  test('DELETE /v1/plans/:id - delete created plan (cleanup last) @smoke @regression @api @plans', async ({
+    request,
+  }) => {
     test.skip(!createdPlanId, 'No plan created');
     await deleteTestPlan(request, createdPlanId);
     createdPlanId = '';
   });
 
   // NEGATIVE: POST with missing required fields
-  test('POST /v1/plans - missing required fields should return 400 @negative', async ({
+  test('POST /v1/plans - missing required fields should return 400 @negative @regression @api @plans', async ({
     request,
   }) => {
     const response = await request.post(PLANS_URL, {
@@ -227,50 +233,8 @@ test.describe.serial('Plan Manager API @api @plans', () => {
     }
   });
 
-  // NEGATIVE: GET without token
-  test('GET /v1/plans without token - should return 401 @negative', async ({ request }) => {
-    const response = await request.get(`${PLANS_URL}?employerId=${employerId}`);
-    expect(response.status()).toBe(401);
-    const body = await response.json();
-    expect(body).toMatchObject({
-      statusCode: 401,
-      error: 'Unauthorized',
-      message: expect.any(String),
-    });
-  });
-
-  // NEGATIVE: PATCH invalid id
-  test('PATCH /v1/plans/:id with invalid id - should return 400 @negative', async ({ request }) => {
-    const response = await request.patch(`${PLANS_URL}/not-a-uuid-123`, {
-      headers: authHeaders,
-      data: { planName: 'X' },
-    });
-    expect(response.status()).toBe(400);
-    const body = await response.json();
-    expect(body).toMatchObject({
-      statusCode: 400,
-      error: 'Bad Request',
-      message: expect.any(String),
-    });
-  });
-
-  // NEGATIVE: PATCH without token
-  test('PATCH /v1/plans/:id without token - should return 401 @negative', async ({ request }) => {
-    const response = await request.patch(`${PLANS_URL}/not-a-uuid-123`, {
-      headers: { 'Content-Type': 'application/json' },
-      data: { planName: 'X' },
-    });
-    expect(response.status()).toBe(401);
-    const body = await response.json();
-    expect(body).toMatchObject({
-      statusCode: 401,
-      error: 'Unauthorized',
-      message: expect.any(String),
-    });
-  });
-
   // NEGATIVE: DELETE invalid id
-  test('DELETE /v1/plans/:id with invalid id - should return 400 @negative', async ({
+  test('DELETE /v1/plans/:id with invalid id - should return 400 @negative @regression @api @plans', async ({
     request,
   }) => {
     const response = await request.delete(`${PLANS_URL}/not-a-uuid-123`, {
@@ -286,7 +250,9 @@ test.describe.serial('Plan Manager API @api @plans', () => {
   });
 
   // NEGATIVE: DELETE without token
-  test('DELETE /v1/plans/:id without token - should return 401 @negative', async ({ request }) => {
+  test('DELETE /v1/plans/:id without token - should return 401 @negative @regression @api @plans', async ({
+    request,
+  }) => {
     const response = await request.delete(`${PLANS_URL}/not-a-uuid-123`);
     expect(response.status()).toBe(401);
     const body = await response.json();

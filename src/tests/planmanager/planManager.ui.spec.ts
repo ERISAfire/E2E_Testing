@@ -3,7 +3,7 @@ import { LoginPage } from '../../ui/pages/LoginPage.js';
 import { PlanManagerPage } from '../../ui/pages/PlanManagerPage.js';
 
 test.describe.serial('Plan Manager UI E2E', () => {
-  test('should create, open from timeline, and edit a plan @smoke @regression @ui @planManager', async ({
+  test('should create, open from timeline, edit and delete a plan @smoke @regression @ui @planManager', async ({
     page,
   }) => {
     // Login
@@ -23,13 +23,13 @@ test.describe.serial('Plan Manager UI E2E', () => {
     // Fill wizard steps
     await planManager.fillGeneralPlanInformation({
       planName: 'Automation Tests',
-      planNumber: '3',
+      planNumber: '1',
     });
 
     await planManager.fillCompanyInformation({
-      sponsorCompanyName: 'Advice Corp',
-      sponsorEin: '12-3456789_',
-      sponsorPhone: '123-456-7890_',
+      sponsorCompanyName: 'Auto Tests',
+      sponsorEin: '12-3456789',
+      sponsorPhone: '123-456-7890',
     });
 
     await planManager.fillStatuses({
@@ -43,7 +43,7 @@ test.describe.serial('Plan Manager UI E2E', () => {
     await planManager.finishCreation();
 
     // Open created plan from timeline (scrolling left if needed)
-    await planManager.openPlanFromTimeline('Automation Tests 3');
+    await planManager.openPlanFromTimeline('Automation Tests 1');
 
     // Update General plan information
     await planManager.updateGeneralPlanInformation({

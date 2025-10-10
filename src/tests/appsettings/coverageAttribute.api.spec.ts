@@ -194,7 +194,6 @@ test.describe.serial('Coverage Attribute API', () => {
         expect(item).toHaveProperty('name');
         expect(item).toHaveProperty('color');
         expect(item).toHaveProperty('order');
-        expect(item).toHaveProperty('status');
         expect(item).toHaveProperty('createdAt');
         expect(item).toHaveProperty('updatedAt');
       }

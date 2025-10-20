@@ -879,7 +879,6 @@ Use tags to categorize tests:
 
   - `@ui` - UI tests
   - `@api` - API tests
-  - `@e2e` - End-to-end tests
 
 - **Test Levels**
 

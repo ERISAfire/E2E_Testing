@@ -49,8 +49,8 @@ const authHeaders = {
 // Generate a unique plan year (far future) to avoid overlap with existing plans
 type UniquePlanDates = { startIso: string; endIso: string; year: number };
 const computeUniquePlanDates = (): UniquePlanDates => {
-  const base = 2070; // far future to avoid collisions with seeded data
-  const offset = Math.floor(Date.now() / 1000) % 25; // 0..24
+  const base = 2200; // push farther into the future to avoid seeded/previous test data
+  const offset = Math.floor(Date.now() / 1000) % 200; // 0..199 (200-year window)
   const year = base + offset;
   const start = new Date(Date.UTC(year, 0, 1, 12, 0, 0)); // Jan 1, year at noon UTC
   const end = new Date(Date.UTC(year, 11, 31, 12, 0, 0)); // Dec 31, year at noon UTC
@@ -163,12 +163,26 @@ test.describe.serial('Plan Manager API', () => {
       expect(createdPlanSnapshot, 'Unable to load created plan snapshot for PATCH').toBeTruthy();
     }
 
+    // Compute a non-overlapping plan window for the PATCH update.
+    const nextDates = ((): { startIso: string; endIso: string } => {
+      const { startIso, endIso, year } = computeUniquePlanDates();
+      // If the computed year matches the current plan's year, bump by 1 year to avoid overlap
+      if (createdPlanSnapshot && createdPlanSnapshot.planStartDate.startsWith(`${year}-`)) {
+        const y = year + 1;
+        return {
+          startIso: new Date(Date.UTC(y, 0, 1, 12, 0, 0)).toISOString(),
+          endIso: new Date(Date.UTC(y, 11, 31, 12, 0, 0)).toISOString(),
+        };
+      }
+      return { startIso, endIso };
+    })();
+
     const fullUpdatePayload = {
       employerId: createdPlanSnapshot!.employerId,
       planName: '2025-26 Plan 501 - Updated',
       planNumber: 502,
-      planStartDate: createdPlanSnapshot!.planStartDate,
-      planEndDate: createdPlanSnapshot!.planEndDate,
+      planStartDate: nextDates.startIso,
+      planEndDate: nextDates.endIso,
       sponsorEin: createdPlanSnapshot!.sponsorEin,
       sponsorName: createdPlanSnapshot!.sponsorName,
       sponsorPhone: createdPlanSnapshot!.sponsorPhone,

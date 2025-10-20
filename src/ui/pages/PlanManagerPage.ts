@@ -35,6 +35,21 @@ import {
   getPlanNameRequiredError,
   getPlanNumberRequiredError,
   getDialogCloseButton,
+  // Coverage selectors
+  getAddCoverageButton,
+  getCoverageTypeCombobox,
+  getCoverageTypeOption,
+  getCoverageAttributeCombobox,
+  getCoverageAddButton,
+  getCoverageSaveButton,
+  getCoverageCardHeading,
+  getCoverageKebabButtons,
+  getCoverageMenuEdit,
+  getCoverageMenuDelete,
+  getDeleteCoverageModal,
+  getCoverageCreatedToast,
+  getCoverageUpdatedToast,
+  getCoverageDeletedToast,
 } from '../selectors/planManager.selectors.js';
 
 export interface PlanGeneralInfo {
@@ -276,5 +291,51 @@ export class PlanManagerPage extends BasePage {
 
     // Close the modal
     await getDialogCloseButton(this.page).click();
+  }
+
+  // Coverage flows
+  async addCoverage(args: { type: string; attributeName: string }): Promise<void> {
+    const { type, attributeName } = args;
+    await this.page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
+    await getAddCoverageButton(this.page).click();
+
+    await getCoverageTypeCombobox(this.page).click();
+    await getCoverageTypeOption(this.page, type).click();
+
+    await getCoverageAttributeCombobox(this.page).click();
+    await getCoverageAttributeCombobox(this.page).fill(attributeName);
+
+    // Confirm Add and wait for toast
+    await getCoverageAddButton(this.page).click();
+    await expect(getCoverageCreatedToast(this.page)).toBeVisible({ timeout: 45000 });
+  }
+
+  async openCoverageCard(name: string): Promise<void> {
+    const card = getCoverageCardHeading(this.page, name);
+    await card.scrollIntoViewIfNeeded();
+    await card.click();
+  }
+
+  async editCoverageType(args: { from: string; to: string }): Promise<void> {
+    const { from, to } = args;
+    await this.openCoverageCard(from);
+    await getCoverageKebabButtons(this.page).nth(3).click();
+    await getCoverageMenuEdit(this.page).click();
+
+    await getCoverageTypeCombobox(this.page).click();
+    await getCoverageTypeOption(this.page, to).click();
+
+    await getCoverageSaveButton(this.page).click();
+    await expect(getCoverageUpdatedToast(this.page)).toBeVisible({ timeout: 45000 });
+  }
+
+  async deleteCoverage(name: string): Promise<void> {
+    await this.openCoverageCard(name);
+    await getCoverageKebabButtons(this.page).nth(3).click();
+    await getCoverageMenuDelete(this.page).click();
+
+    await expect(getDeleteCoverageModal(this.page)).toBeVisible({ timeout: 10000 });
+    await getDeleteConfirmButton(this.page).click();
+    await expect(getCoverageDeletedToast(this.page)).toBeVisible({ timeout: 45000 });
   }
 }

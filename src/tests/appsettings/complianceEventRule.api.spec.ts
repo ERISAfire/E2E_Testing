@@ -168,8 +168,12 @@ const deleteTestComplianceEventRule = async (
     },
   });
 
-  if (response.status() !== 200) {
-    console.warn(`Failed to delete test compliance event rule ${id}: ${response.status()}`);
+  const status = response.status();
+  if (status === 404) {
+    return; // already deleted, ignore
+  }
+  if (status !== 200 && status !== 204) {
+    console.warn(`Failed to delete test compliance event rule ${id}: ${status}`);
   }
 };
 

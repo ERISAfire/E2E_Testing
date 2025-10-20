@@ -101,3 +101,34 @@ export const getDeletePlanYearModalContent = (page: Page): Locator =>
 
 export const getDeleteConfirmButton = (page: Page): Locator =>
   page.getByRole('button', { name: /^Delete$/ });
+
+// Coverages section
+export const getAddCoverageButton = (page: Page): Locator =>
+  page.getByRole('button', { name: 'Add Coverage' });
+export const getCoverageTypeCombobox = (page: Page): Locator =>
+  page.getByRole('combobox', { name: 'Coverage type' });
+export const getCoverageTypeOption = (page: Page, name: string): Locator =>
+  page.getByRole('option', { name });
+export const getCoverageAttributeCombobox = (page: Page): Locator =>
+  page.getByRole('combobox', { name: 'Coverage attribute' });
+export const getCoverageAddButton = (page: Page): Locator =>
+  page.getByRole('button', { name: 'Add' });
+export const getCoverageSaveButton = (page: Page): Locator =>
+  page.getByRole('button', { name: 'Save' });
+export const getCoverageCardHeading = (page: Page, name: string): Locator =>
+  page.getByRole('heading', { name });
+export const getCoverageKebabButtons = (page: Page): Locator =>
+  page.locator('#plan-card-container').getByRole('button').filter({ hasText: /^$/ });
+export const getCoverageMenuEdit = (page: Page): Locator =>
+  page.getByRole('menuitem', { name: 'Edit' });
+export const getCoverageMenuDelete = (page: Page): Locator =>
+  page.getByRole('menuitem', { name: 'Delete' });
+export const getDeleteCoverageModal = (page: Page): Locator => page.getByLabel('Delete coverage');
+
+// Coverage toasts
+export const getCoverageCreatedToast = (page: Page): Locator =>
+  page.getByText('Coverage has been created.');
+export const getCoverageUpdatedToast = (page: Page): Locator =>
+  page.getByText('Coverage has been updated.');
+export const getCoverageDeletedToast = (page: Page): Locator =>
+  page.getByText('Coverage has been deleted.');

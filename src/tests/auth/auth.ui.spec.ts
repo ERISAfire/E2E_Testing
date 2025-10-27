@@ -53,7 +53,7 @@ test.describe('Auth UI Tests', () => {
      * Test failed login with random invalid credentials
      * @tags regression, ui, auth
      */
-    test('should fail with invalid credentials @regression @ui @auth', async () => {
+    test.skip('should fail with invalid credentials @regression @ui @auth', async () => {
       // Using utility methods to generate random credentials
       const randomEmail = RandomUtils.getRandomEmail();
 

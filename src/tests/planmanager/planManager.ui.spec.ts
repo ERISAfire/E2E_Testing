@@ -3,7 +3,7 @@ import { LoginPage } from '../../ui/pages/LoginPage.js';
 import { PlanManagerPage } from '../../ui/pages/PlanManagerPage.js';
 
 test.describe.serial('Plan Manager UI E2E', () => {
-  test('should create, open from timeline, edit and delete a plan @smoke @regression @ui @planManager', async ({
+  test('should create, open from timeline, edit and delete a plan @smoke @regression @ui @plan', async ({
     page,
   }) => {
     // Login

@@ -5,7 +5,7 @@ import { PlanManagerPage } from '../../ui/pages/PlanManagerPage.js';
 // UI test for Coverage CRUD within Plan Manager
 // Flow: Create plan -> Add coverage -> Edit coverage -> Delete coverage -> Cleanup plan year
 
-test.describe.serial('Plan Manager UI - Coverage @ui @plans @regression @planManager', () => {
+test.describe.serial('Plan Manager UI - Coverage @ui @plans @regression @plan', () => {
   test('should add, edit, and delete a coverage in a plan, then delete the plan year', async ({
     page,
   }) => {

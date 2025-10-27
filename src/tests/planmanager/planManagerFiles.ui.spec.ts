@@ -20,7 +20,7 @@ function ensureScheduleAPdfOnDisk(): string {
 
 // New UI test focused on file upload/delete flow for Plan Manager
 
-test.describe.serial('Plan Manager UI - Files @ui @plans @regression @planManager', () => {
+test.describe.serial('Plan Manager UI - Files @ui @plans @regression @plan', () => {
   test('should upload and delete Schedule A file for a plan', async ({ page }) => {
     // Login
     const loginPage = new LoginPage(page);

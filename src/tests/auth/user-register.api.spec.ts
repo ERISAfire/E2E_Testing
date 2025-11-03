@@ -6,7 +6,8 @@ import { EnvConfig } from '../../config/env.config.js';
  *
  * Flow covered:
  * 1) POST /v1/users/invites -> invite user
- * 2) POST /v1/auth/register/verify -> get registration code
+ * 2a) POST /v1/auth/register/verify -> get registration code
+ * 2b) GET /v1/auth/register/verify?code=... -> validate the code using GET
  * 3) POST /v1/auth/register -> register invited user
  * 4) GET /v1/users -> find created user by email
  * 5) DELETE /v1/users/:id -> cleanup
@@ -15,12 +16,13 @@ import { EnvConfig } from '../../config/env.config.js';
  * - Uses bearer token from `API_BEARER_TOKEN`
  * - Uses API base from `API_BASE_URL`
  * - Organization is taken from `ORGANIZATION_ID` if present, otherwise falls back to provided sample ID
+ * - Each run uses a unique email to avoid collisions; best-effort cleanup is performed
  */
 
 test.describe.serial('User Register API @api @userRegister', () => {
   let apiBaseUrl: string;
   let bearerToken: string;
-  const orgId = process.env.ORGANIZATION_ID || '66e5f76a-6ba5-4e8c-bf34-5e3ed1b3bef3';
+  const orgId = process.env.ORGANIZATION_ID;
 
   test.beforeAll(() => {
     const env = EnvConfig.getInstance();
@@ -66,6 +68,26 @@ test.describe.serial('User Register API @api @userRegister', () => {
       expect(verifyBody).toMatchObject({ isExistingEmail: false, type: 2 });
       const code: string = verifyBody.code;
       expect(typeof code).toBe('string');
+
+      // 2b) GET verify to validate code via GET endpoint as well
+      const getUrl = new URL(`${apiBaseUrl}/v1/auth/register/verify`);
+      getUrl.searchParams.append('code', code);
+      const getVerifyResp = await request.get(getUrl.toString(), {
+        headers: {
+          accept: 'application/json',
+          authorization: `Bearer ${bearerToken}`,
+        },
+      });
+      expect(getVerifyResp.status()).toBe(200);
+      const getVerifyBody: unknown = await getVerifyResp.json();
+      if (getVerifyBody && typeof getVerifyBody === 'object') {
+        const obj = getVerifyBody as Record<string, unknown>;
+        expect(obj['isExistingEmail']).toBe(false);
+        expect(typeof obj['code']).toBe('string');
+        const emailVal = (obj['email'] as string | undefined) || '';
+        expect(emailVal.toLowerCase()).toBe(email.toLowerCase());
+        expect(obj['type']).toBe(2);
+      }
 
       // 3) Register user with the code
       const registerResp = await request.post(`${apiBaseUrl}/v1/auth/register`, {
@@ -153,7 +175,9 @@ test.describe.serial('User Register API @api @userRegister', () => {
         for (let attempt = 0; attempt < 10 && !foundId; attempt++) {
           const urlSearch = new URL(`${apiBaseUrl}/v1/users`);
           urlSearch.searchParams.append('search', email);
-          urlSearch.searchParams.append('filters[consultantCompany]', orgId);
+          if (orgId) {
+            urlSearch.searchParams.append('filters[consultantCompany]', orgId);
+          }
           urlSearch.searchParams.append('perPage', '100');
           urlSearch.searchParams.append('page', '1');
           const res = await request.get(urlSearch.toString(), { headers });
@@ -191,7 +215,9 @@ test.describe.serial('User Register API @api @userRegister', () => {
           }
           if (!foundId) {
             const urlAll = new URL(`${apiBaseUrl}/v1/users`);
-            urlAll.searchParams.append('filters[consultantCompany]', orgId);
+            if (orgId) {
+              urlAll.searchParams.append('filters[consultantCompany]', orgId);
+            }
             urlAll.searchParams.append('perPage', '100');
             urlAll.searchParams.append('page', '1');
             const resAll = await request.get(urlAll.toString(), { headers });
@@ -333,7 +359,9 @@ test.describe.serial('User Register API @api @userRegister', () => {
       for (let attempt = 0; attempt < 5 && !invitedUserUserId && !invitedRecordId; attempt++) {
         const urlSearch = new URL(`${apiBaseUrl}/v1/users`);
         urlSearch.searchParams.append('search', email);
-        urlSearch.searchParams.append('filters[consultantCompany]', orgId);
+        if (orgId) {
+          urlSearch.searchParams.append('filters[consultantCompany]', orgId);
+        }
         urlSearch.searchParams.append('perPage', '50');
         urlSearch.searchParams.append('page', '1');
         const res = await request.get(urlSearch.toString(), {

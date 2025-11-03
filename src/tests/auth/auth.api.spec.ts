@@ -34,7 +34,10 @@ test.describe.serial('Auth API - Session @api @auth', () => {
     userPassword = env.get<string>('credentials.password');
   });
 
-  test('should create a session with cookie id @api @auth', async ({ page, request }) => {
+  test('should create a session with cookie id @api @auth @regression', async ({
+    page,
+    request,
+  }) => {
     await page.goto(baseUrl);
     await page.waitForLoadState('networkidle');
     let cookies = await page.context().cookies();
@@ -75,7 +78,10 @@ test.describe.serial('Auth API - Session @api @auth', () => {
     expect(body, 'Expected JSON body in response').toBeTruthy();
   });
 
-  test('should fail with invalid bearer token @negative @api @auth', async ({ page, request }) => {
+  test('should fail with invalid bearer token @negative @api @auth @regression', async ({
+    page,
+    request,
+  }) => {
     await page.goto(baseUrl);
     await page.waitForLoadState('networkidle');
     let cookies = await page.context().cookies();
@@ -111,7 +117,7 @@ test.describe.serial('Auth API - Session @api @auth', () => {
     expect([401, 403]).toContain(response.status());
   });
 
-  test('should login with valid credentials @api @auth', async ({ request }) => {
+  test('should login with valid credentials @api @auth @regression', async ({ request }) => {
     const response = await request.post(`${apiBaseUrl}/v1/auth/login`, {
       headers: {
         accept: 'application/json',
@@ -134,7 +140,9 @@ test.describe.serial('Auth API - Session @api @auth', () => {
     expect(typeof body.displayName).toBe('string');
   });
 
-  test('should reject login with invalid password @negative @api @auth', async ({ request }) => {
+  test('should reject login with invalid password @negative @api @auth @regression', async ({
+    request,
+  }) => {
     const response = await request.post(`${apiBaseUrl}/v1/auth/login`, {
       headers: {
         accept: 'application/json',
@@ -157,7 +165,9 @@ test.describe.serial('Auth API - Session @api @auth', () => {
     expect(typeof body.correlationId).toBe('string');
   });
 
-  test('should reject login for nonexistent user @negative @api @auth', async ({ request }) => {
+  test('should reject login for nonexistent user @negative @api @auth @regression', async ({
+    request,
+  }) => {
     const nonExistingEmail = `testsautomation+notfound.${Date.now()}@example.com`;
 
     const response = await request.post(`${apiBaseUrl}/v1/auth/login`, {
@@ -186,7 +196,10 @@ test.describe.serial('Auth API - Session @api @auth', () => {
     expect(typeof body.correlationId).toBe('string');
   });
 
-  test('should logout using fresh UI token and revoke it @api @auth', async ({ page, request }) => {
+  test('should logout using fresh UI token and revoke it @api @auth @regression', async ({
+    page,
+    request,
+  }) => {
     let token: string | undefined;
 
     // 1) Try to login via API and parse Set-Cookie for erisafireusertoken

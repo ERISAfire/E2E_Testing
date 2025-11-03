@@ -4,6 +4,10 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { LoginPage } from '../../ui/pages/LoginPage.js';
 import { PlanManagerPage } from '../../ui/pages/PlanManagerPage.js';
+import {
+  getFileDeletedToast,
+  getOpenEnrollmentGuideFirstDeleteButton,
+} from '../../ui/selectors/planManager.selectors.js';
 
 // Tiny valid PDF ("Schedule A") as base64 to avoid committing binary assets
 // Generated minimal PDF that renders text "Schedule A"
@@ -51,54 +55,53 @@ test.describe.serial('Plan Manager UI - Files @ui @plans @regression @plan', () 
     // Open the created plan from the timeline
     await planManager.openPlanFromTimeline(planName);
 
-    // Scroll to the Schedules A section
-    await page
-      .locator('div')
-      .filter({ hasText: /^Schedules A$/ })
-      .first()
-      .scrollIntoViewIfNeeded();
-    await page
-      .locator('div')
-      .filter({ hasText: /^Schedules A$/ })
-      .first()
-      .click();
-
-    // Click the upload area and upload from disk
-    const pdfPath = ensureScheduleAPdfOnDisk();
-    const uploadText = page.getByText('Schedules AClick to upload or').first();
-    await uploadText.scrollIntoViewIfNeeded();
-
-    // Try to find a real file input in/near the dropzone
-    const nearbyInput = page
-      .locator('div')
-      .filter({ hasText: /^Schedules AClick to upload or drag and drop$/ })
-      .locator('input[type="file"]')
+    // Scroll to the Open enrollment guide card
+    const oeHeading = page
+      .locator('h6')
+      .filter({ hasText: /^Open enrollment guide$/ })
       .first();
+    await oeHeading.scrollIntoViewIfNeeded();
 
-    if (await nearbyInput.count()) {
-      await nearbyInput.setInputFiles(pdfPath);
-    } else {
-      // Fallback to native file chooser triggered by clicking the dropzone/button
-      const [chooser] = await Promise.all([
-        page.waitForEvent('filechooser', { timeout: 10000 }),
-        page
-          .locator('div')
-          .filter({ hasText: /^Schedules AClick to upload or drag and drop$/ })
-          .getByLabel('File upload area')
-          .click(),
-      ]);
+    // Resolve its card container and Upload files button
+    const oeCard = oeHeading.locator(
+      'xpath=ancestor::div[contains(@class,"_filesCard_") or contains(@class,"MuiCard-root") or contains(@class,"MuiPaper")][1]'
+    );
+    await oeCard.waitFor({ state: 'visible', timeout: 15000 });
+    const uploadBtn = oeCard.locator('button:has-text("Upload files")');
+    await uploadBtn.waitFor({ state: 'visible', timeout: 10000 });
+    await uploadBtn.scrollIntoViewIfNeeded();
+
+    // Click Upload files and upload from disk (handle chooser or hidden input)
+    const pdfPath = ensureScheduleAPdfOnDisk();
+    await uploadBtn.click();
+    const chooser = await page.waitForEvent('filechooser', { timeout: 3000 }).catch(() => null);
+    if (chooser) {
       await chooser.setFiles(pdfPath);
+    } else {
+      const dialog = page.getByRole('dialog');
+      const dialogInput = dialog.locator('input[type="file"]').first();
+      if (await dialogInput.count()) {
+        await dialogInput.setInputFiles(pdfPath);
+      } else {
+        const pageInput = page.locator('input[type="file"]').first();
+        await pageInput.setInputFiles(pdfPath);
+      }
     }
 
     // Verify file appears (list item should show and have a delete button)
-    const uploadedItemDeleteBtn = page.getByRole('listitem').getByRole('button').nth(1);
-    await expect(uploadedItemDeleteBtn).toBeVisible();
+    // Verify in-card empty state disappears or an item appears
+    const emptyState = oeCard.getByText('No file uploaded yet.');
+    await expect(emptyState).toBeHidden({ timeout: 20000 });
 
     // Delete the uploaded file
-    await uploadedItemDeleteBtn.click();
+    // Optional cleanup: click first delete button inside this card if present
+    const deleteBtnInCard = getOpenEnrollmentGuideFirstDeleteButton(page);
+    if (await deleteBtnInCard.count()) {
+      await deleteBtnInCard.click();
+    }
 
     // Verify deletion toast
-    await expect(page.getByText('File has been deleted.')).toBeVisible();
+    await expect(getFileDeletedToast(page)).toBeVisible();
 
     // Finally, delete the plan year to clean up (reuse existing page object flow)
     await planManager.deletePlanYear(planName);

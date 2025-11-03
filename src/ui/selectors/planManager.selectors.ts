@@ -125,6 +125,18 @@ export const getCoverageMenuDelete = (page: Page): Locator =>
   page.getByRole('menuitem', { name: 'Delete' });
 export const getDeleteCoverageModal = (page: Page): Locator => page.getByLabel('Delete coverage');
 
+// Coverage: precise kebab button for a given card heading
+export const getCoverageCardContainerByHeading = (page: Page, name: string): Locator =>
+  getCoverageCardHeading(page, name).locator(
+    'xpath=ancestor::div[contains(@id,"plan-card-container") or contains(@class,"MuiCard-root")][1]'
+  );
+
+export const getCoverageCardKebabButton = (page: Page, name: string): Locator =>
+  getCoverageCardContainerByHeading(page, name)
+    .locator('button.MuiIconButton-root:not([aria-label="Download all"])')
+    .filter({ has: page.locator('svg') })
+    .first();
+
 // Coverage toasts
 export const getCoverageCreatedToast = (page: Page): Locator =>
   page.getByText('Coverage has been created.');
@@ -132,3 +144,34 @@ export const getCoverageUpdatedToast = (page: Page): Locator =>
   page.getByText('Coverage has been updated.');
 export const getCoverageDeletedToast = (page: Page): Locator =>
   page.getByText('Coverage has been deleted.');
+
+// Files: Open enrollment guide
+export const getOpenEnrollmentGuideHeading = (page: Page): Locator =>
+  page
+    .locator('h6')
+    .filter({ hasText: /^Open enrollment guide$/ })
+    .first();
+
+export const getOpenEnrollmentGuideCard = (page: Page): Locator =>
+  getOpenEnrollmentGuideHeading(page).locator(
+    'xpath=ancestor::div[contains(@class,"_filesCard_") or contains(@class,"MuiCard-root") or contains(@class,"MuiPaper")][1]'
+  );
+
+export const getOpenEnrollmentGuideUploadButton = (page: Page): Locator =>
+  getOpenEnrollmentGuideCard(page).locator('button:has-text("Upload files")');
+
+export const getOpenEnrollmentGuideEmptyState = (page: Page): Locator =>
+  getOpenEnrollmentGuideCard(page).getByText('No file uploaded yet.', { exact: true });
+
+// Generic helper: first file input inside the active dialog (if upload opens a modal)
+export const getDialogFileInput = (page: Page): Locator =>
+  getActiveDialog(page).locator('input[type="file"]').first();
+
+// Files: deletion helpers
+export const getOpenEnrollmentGuideFirstDeleteButton = (page: Page): Locator =>
+  getOpenEnrollmentGuideCard(page)
+    .locator('button.MuiIconButton-root:has(svg[data-icon="trash"]), button[aria-label="Delete" i]')
+    .first();
+
+export const getFileDeletedToast = (page: Page): Locator =>
+  page.getByText('File has been deleted.');

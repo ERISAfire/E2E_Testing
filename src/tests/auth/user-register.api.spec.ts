@@ -28,10 +28,10 @@ test.describe.serial('User Register API @api @userRegister', () => {
     bearerToken = env.get<string>('apiBearerToken');
   });
 
-  test('should invite, verify, register and delete a user', async ({ request }) => {
+  test('should invite, verify, register and delete a user @regression', async ({ request }) => {
     // unique email per run
     const email = `testsautomation+register.${Date.now()}@example.com`;
-    const phone = `+1${Math.floor(1000000000 + Math.random() * 8999999999)}`;
+    const phone = String(Math.floor(1000000000 + Math.random() * 9000000000));
 
     let createdUserId: string | number | undefined;
 
@@ -83,6 +83,13 @@ test.describe.serial('User Register API @api @userRegister', () => {
           passwordRequired: true,
         },
       });
+      if (![200, 201].includes(registerResp.status())) {
+        const errText = await registerResp.text().catch(() => '');
+        await test.info().attach('register_error', {
+          body: Buffer.from(`status: ${registerResp.status()}\n${errText}`),
+          contentType: 'text/plain',
+        });
+      }
       expect([200, 201]).toContain(registerResp.status());
       let registerBody: unknown;
       try {
@@ -283,7 +290,9 @@ test.describe.serial('User Register API @api @userRegister', () => {
     }
   });
 
-  test('invite should fail on invalid email @negative @api @userRegister', async ({ request }) => {
+  test('invite should fail on invalid email @negative @api @userRegister @regression', async ({
+    request,
+  }) => {
     const resp = await request.post(`${apiBaseUrl}/v1/users/invites`, {
       headers: {
         accept: '*/*',
@@ -294,13 +303,13 @@ test.describe.serial('User Register API @api @userRegister', () => {
         email: 'invalid-email',
         type: 2,
         organization_id: orgId,
-        phone: '+10000000000',
+        phone: '1234567890',
       },
     });
     expect([400, 422]).toContain(resp.status());
   });
 
-  test('invite should fail on duplicate email @negative @api @userRegister', async ({
+  test('invite should fail on duplicate email @negative @api @userRegister @regression', async ({
     request,
   }) => {
     const email = `testsautomation+negdup.${Date.now()}@example.com`;
@@ -309,7 +318,7 @@ test.describe.serial('User Register API @api @userRegister', () => {
       authorization: `Bearer ${bearerToken}`,
       'content-type': 'application/json',
     };
-    const data = { email, type: 2, organization_id: orgId, phone: '+10000000001' };
+    const data = { email, type: 2, organization_id: orgId, phone: '1234567891' };
 
     let invitedUserUserId: string | number | undefined;
     let invitedRecordId: string | number | undefined;
@@ -411,7 +420,7 @@ test.describe.serial('User Register API @api @userRegister', () => {
     }
   });
 
-  test('verify should fail for non-invited email @negative @api @userRegister', async ({
+  test('verify should fail for non-invited email @negative @api @userRegister @regression', async ({
     request,
   }) => {
     const email = `testsautomation+notinvited.${Date.now()}@example.com`;

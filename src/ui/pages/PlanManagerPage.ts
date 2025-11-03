@@ -43,7 +43,7 @@ import {
   getCoverageAddButton,
   getCoverageSaveButton,
   getCoverageCardHeading,
-  getCoverageKebabButtons,
+  getCoverageCardKebabButton,
   getCoverageMenuEdit,
   getCoverageMenuDelete,
   getDeleteCoverageModal,
@@ -319,7 +319,7 @@ export class PlanManagerPage extends BasePage {
   async editCoverageType(args: { from: string; to: string }): Promise<void> {
     const { from, to } = args;
     await this.openCoverageCard(from);
-    await getCoverageKebabButtons(this.page).nth(3).click();
+    await getCoverageCardKebabButton(this.page, from).click();
     await getCoverageMenuEdit(this.page).click();
 
     await getCoverageTypeCombobox(this.page).click();
@@ -331,7 +331,7 @@ export class PlanManagerPage extends BasePage {
 
   async deleteCoverage(name: string): Promise<void> {
     await this.openCoverageCard(name);
-    await getCoverageKebabButtons(this.page).nth(3).click();
+    await getCoverageCardKebabButton(this.page, name).click();
     await getCoverageMenuDelete(this.page).click();
 
     await expect(getDeleteCoverageModal(this.page)).toBeVisible({ timeout: 10000 });

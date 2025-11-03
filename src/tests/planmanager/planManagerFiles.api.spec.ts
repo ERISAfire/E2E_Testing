@@ -91,7 +91,9 @@ test.describe.serial('Plan Manager Files API @api @plans', () => {
   let planId: string;
   let uploadedFileId: string;
 
-  test('POST /v1/plans/:id/files - upload SchedulesA file @api @plans', async ({ request }) => {
+  test('POST /v1/plans/:id/files - upload SchedulesA file @api @plans @regression', async ({
+    request,
+  }) => {
     // Arrange: create a new plan to attach files to
     planId = await createTestPlan(request);
 
@@ -112,7 +114,7 @@ test.describe.serial('Plan Manager Files API @api @plans', () => {
   });
 
   // Negative: unauthorized upload
-  test('POST /v1/plans/:id/files - 401 when unauthorized @api @plans @negative', async ({
+  test('POST /v1/plans/:id/files - 401 when unauthorized @api @plans @negative @regression', async ({
     request,
   }) => {
     test.skip(!planId, 'No plan created');
@@ -127,7 +129,7 @@ test.describe.serial('Plan Manager Files API @api @plans', () => {
   });
 
   // Negative: invalid type
-  test('POST /v1/plans/:id/files - 400 when type is invalid @api @plans @negative', async ({
+  test('POST /v1/plans/:id/files - 400 when type is invalid @api @plans @negative @regression', async ({
     request,
   }) => {
     test.skip(!planId, 'No plan created');
@@ -142,7 +144,7 @@ test.describe.serial('Plan Manager Files API @api @plans', () => {
   });
 
   // Negative: missing file field
-  test('POST /v1/plans/:id/files - 400 when file is missing @api @plans @negative', async ({
+  test('POST /v1/plans/:id/files - 400 when file is missing @api @plans @negative @regression', async ({
     request,
   }) => {
     test.skip(!planId, 'No plan created');
@@ -156,7 +158,7 @@ test.describe.serial('Plan Manager Files API @api @plans', () => {
     expect([400, 422].includes(response.status()), await response.text()).toBeTruthy();
   });
 
-  test('GET /v1/plans/:id/files - list should contain uploaded file @api @plans', async ({
+  test('GET /v1/plans/:id/files - list should contain uploaded file @api @plans @regression', async ({
     request,
   }) => {
     test.skip(!planId || !uploadedFileId, 'No plan or file uploaded');
@@ -175,7 +177,7 @@ test.describe.serial('Plan Manager Files API @api @plans', () => {
     }
   });
 
-  test('GET /v1/plans/:planId/files/:fileId/download - should return 200 @api @plans', async ({
+  test('GET /v1/plans/:planId/files/:fileId/download - should return 200 @api @plans @regression', async ({
     request,
   }) => {
     test.skip(!planId || !uploadedFileId, 'No plan or file uploaded');
@@ -190,7 +192,7 @@ test.describe.serial('Plan Manager Files API @api @plans', () => {
   });
 
   // Negative: download with wrong file id
-  test('GET /v1/plans/:planId/files/:fileId/download - 404 for nonexistent file @api @plans @negative', async ({
+  test('GET /v1/plans/:planId/files/:fileId/download - 404 for nonexistent file @api @plans @negative @regression', async ({
     request,
   }) => {
     test.skip(!planId, 'No plan created');
@@ -201,7 +203,7 @@ test.describe.serial('Plan Manager Files API @api @plans', () => {
     expect([404, 400].includes(response.status()), await response.text()).toBeTruthy();
   });
 
-  test('DELETE /v1/plans/:planId/files/:fileId - delete uploaded file @api @plans', async ({
+  test('DELETE /v1/plans/:planId/files/:fileId - delete uploaded file @api @plans @regression', async ({
     request,
   }) => {
     test.skip(!planId || !uploadedFileId, 'No plan or file uploaded');
@@ -213,7 +215,7 @@ test.describe.serial('Plan Manager Files API @api @plans', () => {
     expect(body.id).toBe(uploadedFileId);
   });
 
-  test('DELETE /v1/plans/:id - cleanup plan @api @plans', async ({ request }) => {
+  test('DELETE /v1/plans/:id - cleanup plan @api @plans @regression', async ({ request }) => {
     test.skip(!planId, 'No plan created');
     await deleteTestPlan(request, planId);
   });

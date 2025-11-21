@@ -48,9 +48,20 @@ jobs:
           cat > .env << EOF
           BASE_URL=${{ secrets.BASE_URL }}
           API_BASE_URL=${{ secrets.API_BASE_URL }}
+          ADMIN_EMAIL=${{ secrets.ADMIN_EMAIL }}
+          ADMIN_PASSWORD=${{ secrets.ADMIN_PASSWORD }}
+          API_BEARER_TOKEN=${{ secrets.API_BEARER_TOKEN }}
           USER_EMAIL=${{ secrets.USER_EMAIL }}
           USER_PASSWORD=${{ secrets.USER_PASSWORD }}
-          API_BEARER_TOKEN=${{ secrets.API_BEARER_TOKEN }}
+          CONSULTANT_EMAIL=${{ secrets.CONSULTANT_EMAIL }}
+          CONSULTANT_PASSWORD=${{ secrets.CONSULTANT_PASSWORD }}
+          CONSULTANT_ORG_ID=${{ secrets.CONSULTANT_ORG_ID }}
+          EMPLOYER_EMAIL=${{ secrets.EMPLOYER_EMAIL }}
+          EMPLOYER_PASSWORD=${{ secrets.EMPLOYER_PASSWORD }}
+          EMPLOYER_ORG_ID=${{ secrets.EMPLOYER_ORG_ID }}
+          X_API_KEY=${{ secrets.X_API_KEY }}
+          DEFAULT_TIMEOUT=${{ secrets.DEFAULT_TIMEOUT }}
+          API_TIMEOUT=${{ secrets.API_TIMEOUT }}
           EOF
 
       - name: Build project

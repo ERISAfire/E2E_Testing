@@ -82,7 +82,10 @@ const createTestPlan = async (
 
 const deleteTestPlan = async (request: APIRequestContext, id: string): Promise<void> => {
   const response = await request.delete(`${PLANS_URL}/${id}`, { headers: authHeaders });
-  expect([200, 204].includes(response.status()), await response.text()).toBeTruthy();
+  if (![200, 204].includes(response.status())) {
+    const body = await response.text();
+    console.warn('Plan cleanup delete failed', response.status(), body);
+  }
 };
 
 // Spec

@@ -6,6 +6,7 @@
  * It follows the Page Object design pattern for better maintainability.
  */
 import { BasePage } from '../../core/base/BasePage.js';
+import { EnvConfig } from '../../config/env.config.js';
 import {
   getSignInButton,
   getEmailInput,
@@ -54,6 +55,12 @@ export class LoginPage extends BasePage {
    * await loginPage.login('user@example.com', 'password');
    */
   async login(email: string, password: string): Promise<void> {
+    if (!email || !password) {
+      const env = EnvConfig.getInstance();
+      const creds = env.get<{ email: string; password: string }>('credentials');
+      email = email || creds.email;
+      password = password || creds.password;
+    }
     await (await getSignInButton(this.page)).click();
     await this.page.waitForSelector('[id="1-email"]', { timeout: 10000 });
     await (await getEmailInput(this.page)).fill(email);

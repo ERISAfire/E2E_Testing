@@ -87,8 +87,8 @@ export class EnvConfig {
       apiBaseUrl: this.getRequiredEnv('API_BASE_URL'),
       defaultTimeout: Number(process.env.DEFAULT_TIMEOUT || 90000),
       credentials: {
-        email: this.getRequiredEnv('USER_EMAIL'),
-        password: this.getRequiredEnv('USER_PASSWORD'),
+        email: this.getRequiredEnv('ADMIN_EMAIL'),
+        password: this.getRequiredEnv('ADMIN_PASSWORD'),
       },
       apiBearerToken: this.getRequiredEnv('API_BEARER_TOKEN'),
     };
